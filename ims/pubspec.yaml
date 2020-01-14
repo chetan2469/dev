@@ -19,7 +19,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-
+  json_annotation: ^2.0.0
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^0.1.2
@@ -33,11 +33,12 @@ dependencies:
   sqflite:
   intl:
   http:
+  flutter_datetime_picker: ^1.3.2
   url_launcher: ^5.1.3
   flutter_markdown: ^0.2.0
   webview_flutter: ^0.3.5+4
   photo_view:
-  cached_network_image:
+  cached_network_image: ^2.0.0-rc.1
   circular_profile_avatar: ^1.0.2
   shared_preferences: ^0.5.3+5
   font_awesome_flutter: ^8.5.0
@@ -46,7 +47,6 @@ dependencies:
   local_auth: ^0.6.0+1
   flutter_chips_input: ^1.5.1
   flutter_sms: ^1.1.0
-  #firebase_ml_vision: ^0.9.3+3
 
 
 dev_dependencies:
@@ -70,7 +70,7 @@ module:
 
   # To add assets to your application, add an assets section, like this:
   assets:
-    - assets/
+    - img/chedo.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

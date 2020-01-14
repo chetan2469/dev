@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Record {
+  final List courses;
   final String name,
       address,
       mobileno,
@@ -33,6 +34,7 @@ class Record {
         addDate = map['addDate'],
         status = map['status'],
         gender = map['gender'],
+        courses = map['courses'],
         imageurl = map['imageUrl'];
 
   Record.fromSnapshot(DocumentSnapshot snapshot)

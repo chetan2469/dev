@@ -5,7 +5,8 @@ class StudentCourseEntry {
   final int course_total_fees, course_remaining_fees;
   Timestamp course_start_date, course_end_date;
   final DocumentReference reference;
-  List<dynamic> receiptList = List();
+
+  List<dynamic> receiptList;
 
   StudentCourseEntry.fromMap(Map<String, dynamic> map, {this.reference})
       : assert(map['course_name'] != null),
@@ -17,7 +18,7 @@ class StudentCourseEntry {
         course_total_fees = map['course_total_fees'],
         course_remaining_fees = map['course_remaining_fees'],
         course_start_date = map['course_start_date'],
-        receiptList = List.from(map['receipt']),
+        receiptList = map['receipt'],
         course_end_date = map['course_end_date'];
 
   StudentCourseEntry.fromSnapshot(DocumentSnapshot snapshot)

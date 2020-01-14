@@ -8,6 +8,7 @@ import 'package:ims/student_module/addmission.dart';
 import 'package:ims/student_module/studentListView.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'constants/constants.dart';
+import 'package:flutter/cupertino.dart';
 
 class ShowMenu extends StatefulWidget {
   final Function _handleSignOut;
@@ -85,7 +86,7 @@ class _ShowMenu extends State<ShowMenu> {
                       onTap: () {
                         Navigator.push(
                             context,
-                            MaterialPageRoute(
+                            CupertinoPageRoute(
                                 builder: (context) => AddStudInfo()));
                       },
                       child: Container(
@@ -111,7 +112,7 @@ class _ShowMenu extends State<ShowMenu> {
                         setState(() {
                           Navigator.push(
                               context,
-                              MaterialPageRoute(
+                              CupertinoPageRoute(
                                   builder: (context) =>
                                       WebViewContainer(enqFormUrl)));
                         });
@@ -145,7 +146,7 @@ class _ShowMenu extends State<ShowMenu> {
                         setState(() {
                           Navigator.push(
                               context,
-                              MaterialPageRoute(
+                              CupertinoPageRoute(
                                   builder: (context) => StudentListView()));
                         });
                       },
@@ -170,7 +171,7 @@ class _ShowMenu extends State<ShowMenu> {
                       onTap: () {
                         Navigator.push(
                             context,
-                            MaterialPageRoute(
+                            CupertinoPageRoute(
                                 builder: (context) => CourseListView()));
                       },
                       child: Container(
@@ -200,23 +201,25 @@ class _ShowMenu extends State<ShowMenu> {
                       Positioned(
                         child: Container(
                           height: 10,
-                          color: Colors.white,
+                          color: mode ? Colors.black87 : Colors.white,
                         ),
                       ),
                       Container(
-                        color: Colors.white,
+                        color: mode ? Colors.black87 : Colors.white,
                         height: 150,
                       ),
                       Container(
-                        color: Colors.grey[200],
+                        color: mode ? Colors.black87 : Colors.grey[300],
                         height: 40,
                       ),
                       Container(
-                        color: mode ? Colors.black : Colors.white12,
                         child: Center(
                           child: FloatingActionButton(
-                            onPressed: () {},
-                            shape: CircleBorder(),
+                            onPressed: () {
+                              var media = MediaQuery.of(context);
+                              print(media.size.width);
+                              print(media.size.height);
+                            },
                           ),
                         ),
                       ),
@@ -236,8 +239,6 @@ class _ShowMenu extends State<ShowMenu> {
     } else if (s == 'Logout') {
       setState(() {
         widget._handleSignOut();
-        Navigator.push(
-            context, MaterialPageRoute(builder: (context) => Auth()));
       });
     }
   }
@@ -322,8 +323,10 @@ class _ShowMenu extends State<ShowMenu> {
                   borderRadius: BorderRadius.circular(12)),
               child: ListTile(
                 onTap: () {
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => StudentListView()));
+                  Navigator.push(
+                      context,
+                      CupertinoPageRoute(
+                          builder: (context) => StudentListView()));
                 },
                 leading: Icon(
                   Icons.face,
@@ -360,8 +363,10 @@ class _ShowMenu extends State<ShowMenu> {
                   borderRadius: BorderRadius.circular(12)),
               child: ListTile(
                 onTap: () {
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => CourseListView()));
+                  Navigator.push(
+                      context,
+                      CupertinoPageRoute(
+                          builder: (context) => CourseListView()));
                 },
                 leading: Icon(
                   Icons.book,
@@ -382,7 +387,7 @@ class _ShowMenu extends State<ShowMenu> {
               child: ListTile(
                 onTap: () {
                   Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => Receipt()));
+                      CupertinoPageRoute(builder: (context) => Receipt()));
                 },
                 leading: Icon(
                   Icons.book,
@@ -428,8 +433,6 @@ class _ShowMenu extends State<ShowMenu> {
               child: InkWell(
                 onTap: () {
                   widget._handleSignOut();
-                  Navigator.pushReplacement(
-                      context, MaterialPageRoute(builder: (context) => Auth()));
                 },
                 child: ListTile(
                   leading: Icon(

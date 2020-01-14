@@ -32,12 +32,17 @@ class _StudentListViewState extends State<StudentListView> {
     'Course',
     'Status',
     'Batch Time',
+    'Admission',
   ];
 
   sortBy() {
     if (searchBy == 'Name') {
       filteredStudentList.sort((a, b) {
         return a.name.toLowerCase().compareTo(b.name.toLowerCase());
+      });
+    } else if (searchBy == 'Admission') {
+      filteredStudentList.sort((a, b) {
+        return a.addDate.toString().toLowerCase().compareTo(b.addDate.toString().toLowerCase());
       });
     } else if (searchBy == 'Course') {
       filteredStudentList.sort((a, b) {
@@ -239,8 +244,14 @@ class _StudentListViewState extends State<StudentListView> {
                                     backgroundColor:
                                         Colors.greenAccent.withOpacity(0.4),
                                     elevation: 6,
-                                    label:
-                                        Text(filteredStudentList[i].coursename.length<4?filteredStudentList[i].coursename:filteredStudentList[i].coursename.substring(0,3)),
+                                    label: Text(filteredStudentList[i]
+                                                .coursename
+                                                .length <
+                                            8
+                                        ? filteredStudentList[i].coursename
+                                        : filteredStudentList[i]
+                                            .coursename
+                                            .substring(0, 5)),
                                   ),
                                   SizedBox(
                                     width: 8,
@@ -269,7 +280,9 @@ class _StudentListViewState extends State<StudentListView> {
                                   ),
                                   InkWell(
                                     onTap: () {
-                                      contactDialogue(filteredStudentList[i].mobileno.toString());
+                                      contactDialogue(filteredStudentList[i]
+                                          .mobileno
+                                          .toString());
                                     },
                                     child: CircleAvatar(
                                       child: Icon(Icons.contact_mail),

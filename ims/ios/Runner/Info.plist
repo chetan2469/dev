@@ -41,5 +41,34 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>com.googleusercontent.apps.915649074065-7jctqa5qene5kju23mnhsbmbuqmoopmo</string>
+			</array>
+		</dict>
+	</array>
+<key>NSFaceIDUsageDescription</key>
+<string>Why is my app authenticating using face id?</string>
+<key>NSPhotoLibraryUsageDescription</key>
+<string>Can I use the PhotoLibrary please?</string><key>NSMicrophoneUsageDescription</key>
+<string>Can I use the mic please?</string>
+<key>NSCameraUsageDescription</key>
+<string>Can I use camera please?</string>
+<key>UISupportedInterfaceOrientations~ipad</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationPortraitUpsideDown</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
+	<key>UIViewControllerBasedStatusBarAppearance</key>
+	<false/>
+	<key>io.flutter.embedded_views_preview</key>
+	<string>Yes</string>
 </dict>
 </plist>

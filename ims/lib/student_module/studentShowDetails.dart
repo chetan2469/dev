@@ -20,7 +20,7 @@ class StudentShowDetails extends StatefulWidget {
 
 class _StudentShowDetails extends State<StudentShowDetails> {
   final Record record;
-
+  final List<int> numbers = [1, 2, 3, 5, 8, 13, 21, 34, 55];
   _StudentShowDetails(this.record);
   TextEditingController namefieldController = TextEditingController();
   TextEditingController addressfieldController = TextEditingController();
@@ -29,6 +29,8 @@ class _StudentShowDetails extends State<StudentShowDetails> {
   TextEditingController aadharfieldController = TextEditingController();
   TextEditingController courseController = TextEditingController();
   TextEditingController batchController = TextEditingController();
+
+  TextEditingController addCourseController = TextEditingController();
 
   bool validator1 = true,
       validator2 = true,
@@ -44,8 +46,11 @@ class _StudentShowDetails extends State<StudentShowDetails> {
       DateTime.now().year - 18, DateTime.now().month, DateTime.now().day);
   String thumbnail;
   File _imageFile;
-  String photourl;
+  String photourl,course;
   bool flag = true;
+  List<String> temp = List();
+
+  List courses = List();
 
   Future<Null> _pickImageFromGallery() async {
     print("___________________________________________");
@@ -100,9 +105,30 @@ class _StudentShowDetails extends State<StudentShowDetails> {
     photourl = downurl.toString();
   }
 
+  loadCourses() async {
+    DocumentReference docRef = Firestore.instance
+        .collection('admission')
+        .document(record.reference.toString());
+    DocumentSnapshot doc = await docRef.get();
+
+    courses = doc.data['courses'];
+  }
+
   @override
   void initState() {
     super.initState();
+
+    setState(() {
+      temp.clear();
+
+      if (record.courses != null) {
+        for (var item in record.courses) {
+          temp.add(item);
+        }
+      }
+    });
+
+    loadCourses();
     namefieldController.text = record.name;
     addressfieldController.text = record.address;
     mobileController.text = record.mobileno;
@@ -114,6 +140,49 @@ class _StudentShowDetails extends State<StudentShowDetails> {
     _fromDay = record.dateofbirth.toDate();
     addDate = record.addDate.toDate();
     status = record.status;
+    temp = record.courses;
+  }
+
+  _addCourse() async {
+    await showDialog<String>(
+      context: context,
+      child: new AlertDialog(
+        contentPadding: const EdgeInsets.all(16.0),
+        content: new Row(
+          children: <Widget>[
+            new Expanded(
+              child: new TextField(
+                onChanged: (String str)
+                {
+                  setState(() {
+                    course = str;
+                  });
+                },
+                autofocus: true,
+                decoration: new InputDecoration(
+                    labelText: 'Course Name', hintText: 'eg. Java, C++'),
+              ),
+            )
+          ],
+        ),
+        actions: <Widget>[
+          new FlatButton(
+              child: const Text('cancle'),
+              onPressed: () {
+                Navigator.pop(context);
+              }),
+          new FlatButton(
+              child: const Text('save'),
+              onPressed: () {
+                if (course.length > 0) {
+                  addCourse();
+                  Navigator.pop(context);
+                  print(course);
+                }
+              })
+        ],
+      ),
+    );
   }
 
   @override
@@ -156,38 +225,45 @@ class _StudentShowDetails extends State<StudentShowDetails> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: <Widget>[
-                                  Text(
-                                    record.name,
-                                    style: Theme.of(context).textTheme.title,
+                                  ListTile(
+                                    leading: Text(
+                                      record.name,
+                                      style: Theme.of(context).textTheme.title,
+                                    ),
+                                    trailing: Chip(
+                                      label: Text(
+                                        record.status ? 'Active' : 'Inactive',
+                                        style: TextStyle(color: Colors.white),
+                                      ),
+                                      backgroundColor: Colors.green,
+                                    ),
                                   ),
                                   ListTile(
                                     contentPadding: EdgeInsets.all(0),
-                                    title: Text(record.gender!=null?record.gender:'__'),
-                                    subtitle: Row(
-                                      children: <Widget>[
-                                        Chip(
-                                          label: Text(
-                                            record.coursename,
-                                            style:
-                                                TextStyle(color: Colors.white),
-                                          ),
-                                          backgroundColor:
-                                              Colors.deepOrangeAccent,
-                                        ),
-                                        SizedBox(
-                                          width: 10,
-                                        ),
-                                        Chip(
-                                          label: Text(
-                                            record.status
-                                                ? 'Active'
-                                                : 'Inactive',
-                                            style:
-                                                TextStyle(color: Colors.white),
-                                          ),
-                                          backgroundColor: Colors.green,
-                                        )
-                                      ],
+                                    subtitle: Container(
+                                      height:
+                                          MediaQuery.of(context).size.height *
+                                              0.07,
+                                      child: temp != null
+                                          ? ListView.builder(
+                                              scrollDirection: Axis.horizontal,
+                                              itemCount: temp.length,
+                                              itemBuilder: (context, index) {
+                                                return Container(
+                                                    margin: EdgeInsets.all(2),
+                                                    child: Chip(
+                                                      backgroundColor:
+                                                          Colors.redAccent,
+                                                      label: Text(
+                                                          temp[index]
+                                                              .toString(),
+                                                          style: TextStyle(
+                                                              color:
+                                                                  Colors.white,
+                                                              fontSize: 16.0)),
+                                                    ));
+                                              })
+                                          : Container(),
                                     ),
                                   ),
                                 ],
@@ -219,7 +295,22 @@ class _StudentShowDetails extends State<StudentShowDetails> {
                                 ),
                                 Expanded(
                                   child: Column(
-                                    children: <Widget>[Text("_________")],
+                                    children: <Widget>[
+                                      InkWell(
+                                        onTap: () {
+                                          print('hello');
+                                          _addCourse();
+                                        },
+                                        child: Chip(
+                                          label: Text(
+                                            '+ Course',
+                                            style:
+                                                TextStyle(color: Colors.white),
+                                          ),
+                                          backgroundColor: Colors.green,
+                                        ),
+                                      )
+                                    ],
                                   ),
                                 ),
                                 Expanded(
@@ -317,6 +408,25 @@ class _StudentShowDetails extends State<StudentShowDetails> {
         ),
       ),
     );
+  }
+
+  void addCourse() async {
+    setState(() {
+      temp.add(course);
+    });
+    print(temp.length);
+
+    Firestore.instance
+        .collection('admission')
+        .document(record.reference.documentID)
+        .updateData({
+      'courses': temp,
+    });
+
+    setState(() {
+      course = '';
+    });
+    //  Navigator.pop(context);
   }
 }
 

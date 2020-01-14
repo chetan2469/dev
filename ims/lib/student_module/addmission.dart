@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:math' as Math;
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:ims/constants/constants.dart';
 import 'package:ims/data/course_record.dart';
@@ -237,8 +238,9 @@ class _AddStudInfo extends State<AddStudInfo> {
                         });
                       },
                       child: Container(
-                        height: 120,
-                        margin: EdgeInsets.all(50),
+                        height: MediaQuery.of(context).size.width / 4,
+                        margin: EdgeInsets.all(
+                            MediaQuery.of(context).size.width * 0.02),
                         child: CircleAvatar(
                           //radius: 20,
                           backgroundImage: _imageFile != null
@@ -364,14 +366,33 @@ class _AddStudInfo extends State<AddStudInfo> {
               SizedBox(
                 height: 15,
               ),
-              DateTimePicker(
-                labelText: 'Date Of Birthday',
-                selectedDate: _fromDay,
-                selectDate: (DateTime date) {
-                  setState(() {
-                    _fromDay = date;
-                  });
+              InkWell(
+                onTap: () {
+                  DatePicker.showDatePicker(context,
+                      showTitleActions: true,
+                      minTime: DateTime(1960, 1, 1),
+                      maxTime: DateTime.now(), onChanged: (date) {
+                    print('change $date');
+                  }, onConfirm: (date) {
+                    print('confirm $date');
+                    setState(() {
+                      dob = date;
+                    });
+                  }, currentTime: DateTime.now(), locale: LocaleType.en);
                 },
+                child: Container(
+                  margin: EdgeInsets.only(top: 5, bottom: 5),
+                  padding: EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(25),
+                      border: Border.all(color: Colors.grey)),
+                  child: Text(
+                    dob == null
+                        ? "Set Date Of Birth"
+                        : dob.toString().substring(0, 10),
+                    style: TextStyle(fontSize: 16, color: Colors.black45),
+                  ),
+                ),
               ),
               SizedBox(
                 height: 20,
