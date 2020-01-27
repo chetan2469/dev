@@ -40,16 +40,14 @@ class _StudentShowDetails extends State<StudentShowDetails> {
       validator6 = true,
       validator7 = true,
       togg = false;
-  bool processing = false, status;
+  bool processing = false, status, editing = true;
   DateTime dob, addDate;
   DateTime _fromDay = new DateTime(
       DateTime.now().year - 18, DateTime.now().month, DateTime.now().day);
   String thumbnail;
   File _imageFile;
-  String photourl,course;
+  String photourl, course;
   bool flag = true;
-  List<String> temp = List();
-
   List courses = List();
 
   Future<Null> _pickImageFromGallery() async {
@@ -118,17 +116,7 @@ class _StudentShowDetails extends State<StudentShowDetails> {
   void initState() {
     super.initState();
 
-    setState(() {
-      temp.clear();
-
-      if (record.courses != null) {
-        for (var item in record.courses) {
-          temp.add(item);
-        }
-      }
-    });
-
-    loadCourses();
+    //loadCourses();
     namefieldController.text = record.name;
     addressfieldController.text = record.address;
     mobileController.text = record.mobileno;
@@ -140,7 +128,9 @@ class _StudentShowDetails extends State<StudentShowDetails> {
     _fromDay = record.dateofbirth.toDate();
     addDate = record.addDate.toDate();
     status = record.status;
-    temp = record.courses;
+    courses = record.courses;
+
+    print(courses);
   }
 
   _addCourse() async {
@@ -152,8 +142,7 @@ class _StudentShowDetails extends State<StudentShowDetails> {
           children: <Widget>[
             new Expanded(
               child: new TextField(
-                onChanged: (String str)
-                {
+                onChanged: (String str) {
                   setState(() {
                     course = str;
                   });
@@ -225,29 +214,37 @@ class _StudentShowDetails extends State<StudentShowDetails> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: <Widget>[
-                                  ListTile(
-                                    leading: Text(
-                                      record.name,
-                                      style: Theme.of(context).textTheme.title,
-                                    ),
-                                    trailing: Chip(
-                                      label: Text(
-                                        record.status ? 'Active' : 'Inactive',
-                                        style: TextStyle(color: Colors.white),
-                                      ),
-                                      backgroundColor: Colors.green,
-                                    ),
-                                  ),
+                                  editing
+                                      ? Container(
+                                          child: TextField(
+                                            decoration: InputDecoration(
+                                                hintText: record.name),
+                                          ),
+                                        )
+                                      : ListTile(
+                                          leading: Text(
+                                            record.name,
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .title,
+                                          ),
+                                          trailing: Container(
+                                            width: 10,
+                                            color: record.status
+                                                ? Colors.green
+                                                : Colors.red,
+                                          ),
+                                        ),
                                   ListTile(
                                     contentPadding: EdgeInsets.all(0),
                                     subtitle: Container(
                                       height:
                                           MediaQuery.of(context).size.height *
                                               0.07,
-                                      child: temp != null
+                                      child: courses != null
                                           ? ListView.builder(
                                               scrollDirection: Axis.horizontal,
-                                              itemCount: temp.length,
+                                              itemCount: courses.length,
                                               itemBuilder: (context, index) {
                                                 return Container(
                                                     margin: EdgeInsets.all(2),
@@ -255,7 +252,7 @@ class _StudentShowDetails extends State<StudentShowDetails> {
                                                       backgroundColor:
                                                           Colors.redAccent,
                                                       label: Text(
-                                                          temp[index]
+                                                          courses[index]
                                                               .toString(),
                                                           style: TextStyle(
                                                               color:
@@ -366,32 +363,68 @@ class _StudentShowDetails extends State<StudentShowDetails> {
                         Divider(),
                         ListTile(
                           title: Text("Email"),
-                          subtitle: Text("student@gmail.com"),
+                          subtitle: editing
+                              ? TextField(
+                                  decoration: InputDecoration(
+                                      contentPadding: EdgeInsets.all(10),
+                                      hintText: 'student@gmail.com'),
+                                )
+                              : Text("student@gmail.com"),
                           leading: Icon(Icons.email),
                         ),
                         ListTile(
                           title: Text("Phone"),
-                          subtitle: Text(record.mobileno),
+                          subtitle: editing
+                              ? TextField(
+                                  decoration: InputDecoration(
+                                      contentPadding: EdgeInsets.all(10),
+                                      hintText: record.mobileno),
+                                )
+                              : Text(record.mobileno),
                           leading: Icon(Icons.phone),
                         ),
                         ListTile(
                           title: Text("Optional Number"),
-                          subtitle: Text(record.optionalno),
+                          subtitle: editing
+                              ? TextField(
+                                  decoration: InputDecoration(
+                                      contentPadding: EdgeInsets.all(10),
+                                      hintText: record.optionalno),
+                                )
+                              : Text(record.optionalno),
                           leading: Icon(Icons.call),
                         ),
                         ListTile(
                           title: Text("Address"),
-                          subtitle: Text(record.address),
+                          subtitle: editing
+                              ? TextField(
+                                  decoration: InputDecoration(
+                                      contentPadding: EdgeInsets.all(10),
+                                      hintText: record.address),
+                                )
+                              : Text(record.address),
                           leading: Icon(Icons.confirmation_number),
                         ),
                         ListTile(
                           title: Text("Aadhar Number"),
-                          subtitle: Text("15 February 2019"),
+                          subtitle: editing
+                              ? TextField(
+                                  decoration: InputDecoration(
+                                      contentPadding: EdgeInsets.all(10),
+                                      hintText: record.aadharno),
+                                )
+                              : Text(record.aadharno),
                           leading: Icon(Icons.confirmation_number),
                         ),
                         ListTile(
                           title: Text("Batch Time"),
-                          subtitle: Text(record.batchtime),
+                          subtitle: editing
+                              ? TextField(
+                                  decoration: InputDecoration(
+                                      contentPadding: EdgeInsets.all(10),
+                                      hintText: record.batchtime),
+                                )
+                              : Text(record.batchtime),
                           leading: Icon(Icons.person),
                         ),
                       ],
@@ -407,13 +440,27 @@ class _StudentShowDetails extends State<StudentShowDetails> {
           ],
         ),
       ),
+      floatingActionButton: FloatingActionButton(
+        child: editing ? Icon(Icons.done) : Icon(Icons.edit),
+        onPressed: () {
+          setState(() {
+            editing = !editing;
+          });
+        },
+      ),
     );
   }
 
   void addCourse() async {
+    List temp = List();
+    setState(() {
+      temp = courses;
+    });
+    print('______________$temp');
     setState(() {
       temp.add(course);
     });
+    print('______________$temp');
     print(temp.length);
 
     Firestore.instance

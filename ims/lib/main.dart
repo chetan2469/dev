@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:ims/animation.dart';
 import 'package:ims/auth.dart';
+import 'package:ims/demos/clippingtool.dart';
 import 'package:ims/demos/dialogue.dart';
 
 import 'hero/HeroFirstAnimation.dart';

@@ -47,6 +47,7 @@ dependencies:
   local_auth: ^0.6.0+1
   flutter_chips_input: ^1.5.1
   flutter_sms: ^1.1.0
+  flutter_local_notifications:
 
 
 dev_dependencies:
