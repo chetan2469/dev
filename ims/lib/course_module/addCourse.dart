@@ -318,7 +318,6 @@ class _AddCourse extends State<AddCourse> {
                 height: 15,
               ),
               TextField(
-                keyboardType: TextInputType.number,
                 controller: teacherController,
                 onChanged: (String str5) {
                   if (str5.length < 4) {
@@ -346,7 +345,6 @@ class _AddCourse extends State<AddCourse> {
               ),
               TextField(
                 maxLines: 10,
-                keyboardType: TextInputType.number,
                 controller: syllabusController,
                 onChanged: (String str5) {
                   if (str5.length < 12) {

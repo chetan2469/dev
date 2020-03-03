@@ -3,6 +3,7 @@ import 'package:ims/course_module/courseList.dart';
 import 'package:ims/enquiryForm.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:ims/firebaseArrayCRUD/listArrayItems.dart';
 import 'package:ims/receiptMenu.dart/receipt.dart';
 import 'package:ims/student_module/addmission.dart';
 import 'package:ims/student_module/studentListView.dart';
@@ -422,7 +423,7 @@ class _ShowMenu extends State<ShowMenu> {
             ),
             Container(
               height: 2,
-              margin: EdgeInsets.only(top: 10, left: 20, right: 20),
+              margin: EdgeInsets.only(top: 5, left: 20, right: 20),
               color: Colors.grey,
             ),
             Container(
@@ -446,6 +447,11 @@ class _ShowMenu extends State<ShowMenu> {
                   ),
                 ),
               ),
+            ),
+            Container(
+              height: 2,
+              margin: EdgeInsets.only(top: 10, left: 20, right: 20),
+              color: Colors.grey,
             ),
           ],
         ),

@@ -5,10 +5,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:ims/data/course_record.dart';
 import 'package:ims/data/record.dart';
 import 'package:ims/viewImage.dart';
 import 'package:intl/intl.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 
 class StudentShowDetails extends StatefulWidget {
   final Record record;
@@ -22,6 +24,7 @@ class _StudentShowDetails extends State<StudentShowDetails> {
   final Record record;
   final List<int> numbers = [1, 2, 3, 5, 8, 13, 21, 34, 55];
   _StudentShowDetails(this.record);
+
   TextEditingController namefieldController = TextEditingController();
   TextEditingController addressfieldController = TextEditingController();
   TextEditingController mobileController = TextEditingController();
@@ -29,7 +32,6 @@ class _StudentShowDetails extends State<StudentShowDetails> {
   TextEditingController aadharfieldController = TextEditingController();
   TextEditingController courseController = TextEditingController();
   TextEditingController batchController = TextEditingController();
-
   TextEditingController addCourseController = TextEditingController();
 
   bool validator1 = true,
@@ -40,15 +42,16 @@ class _StudentShowDetails extends State<StudentShowDetails> {
       validator6 = true,
       validator7 = true,
       togg = false;
-  bool processing = false, status, editing = true;
+  bool processing = false, status, editing = false;
   DateTime dob, addDate;
-  DateTime _fromDay = new DateTime(
+  DateTime _fromDay = DateTime(
       DateTime.now().year - 18, DateTime.now().month, DateTime.now().day);
   String thumbnail;
   File _imageFile;
-  String photourl, course;
+  String photourl, downurl;
   bool flag = true;
   List courses = List();
+  List<String> courseList = List();
 
   Future<Null> _pickImageFromGallery() async {
     print("___________________________________________");
@@ -58,6 +61,7 @@ class _StudentShowDetails extends State<StudentShowDetails> {
       this._imageFile = imageFile;
       flag = false;
     });
+    _uploadFile();
   }
 
   Future<Null> _pickImageFromCamera() async {
@@ -68,6 +72,7 @@ class _StudentShowDetails extends State<StudentShowDetails> {
       this._imageFile = imageFile;
       flag = false;
     });
+    _uploadFile();
   }
 
   Future<File> compressFile(File file, String targetPath) async {
@@ -83,11 +88,68 @@ class _StudentShowDetails extends State<StudentShowDetails> {
     return result;
   }
 
+  _showDialog(BuildContext context) async {
+    await showDialog<String>(
+        context: context,
+        builder: (BuildContext context) {
+          return SimpleDialog(
+            children: <Widget>[
+              InkWell(
+                onTap: () {
+                  setState(() {
+                    _pickImageFromCamera();
+                  });
+                  Navigator.pop(context);
+                },
+                child: ListTile(
+                  leading: Icon(Icons.camera_alt),
+                  title: Text(
+                    'Camera',
+                    style: TextStyle(fontSize: 20),
+                  ),
+                ),
+              ),
+              InkWell(
+                onTap: () {
+                  setState(() {
+                    _pickImageFromGallery();
+                  });
+                  Navigator.pop(context);
+                },
+                child: ListTile(
+                  leading: Icon(Icons.image),
+                  title: Text(
+                    'Gallery',
+                    style: TextStyle(fontSize: 20),
+                  ),
+                ),
+              ),
+              InkWell(
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => ViewImage(photourl)));
+                },
+                child: ListTile(
+                  leading: Icon(Icons.image),
+                  title: Text(
+                    'View',
+                    style: TextStyle(fontSize: 20),
+                  ),
+                ),
+              )
+            ],
+          );
+        });
+  }
+
   Future<String> _uploadFile() async {
     setState(() {
       processing = true;
     });
-    int __rand = new Math.Random().nextInt(10000);
+    int __rand = Math.Random().nextInt(10000);
 
     final Directory systemTempDir = Directory.systemTemp;
     String __tempName = namefieldController.text,
@@ -98,9 +160,11 @@ class _StudentShowDetails extends State<StudentShowDetails> {
         .child("$__tempName _ $addDate _ $__rand.jpg");
     final StorageUploadTask uploadTask = ref.put(_imageFile);
 
-    var downurl = await (await uploadTask.onComplete).ref.getDownloadURL();
+    downurl = await (await uploadTask.onComplete).ref.getDownloadURL();
     thumbnail = downurl.toString();
     photourl = downurl.toString();
+    update();
+    print(photourl);
   }
 
   loadCourses() async {
@@ -109,64 +173,122 @@ class _StudentShowDetails extends State<StudentShowDetails> {
         .document(record.reference.toString());
     DocumentSnapshot doc = await docRef.get();
 
-    courses = doc.data['courses'];
+    setState(() {
+      courses = doc.data['courses'];
+    });
+  }
+
+  void update() async {
+    await Firestore.instance
+        .collection('admission')
+        .document(record.reference.documentID)
+        .updateData({
+      'name': namefieldController.text,
+      'address': addressfieldController.text,
+      'mobileNo': mobileController.text,
+      'optNumber': optionalNoController.text,
+      'aadharNo': aadharfieldController.text,
+      'courseName': courseController.text,
+      'batchTime': batchController.text,
+      'imageUrl': photourl,
+      'dateOfBirth': dob,
+      'addDate': addDate,
+      'status': status,
+    });
+    showDialog(
+        context: context,
+        builder: (_) => AlertDialog(
+              title: Text("Updated !!"),
+              content: Text("Data Updated Successfully..."),
+            ));
+    print('Update Successfully !!');
+  }
+
+  fetchCourseData() async {
+    setState(() {
+      processing = true;
+      courseList.clear();
+    });
+    final QuerySnapshot result =
+        await Firestore.instance.collection('courses').getDocuments();
+
+    final List<DocumentSnapshot> documents = result.documents;
+    documents.forEach((data) {
+      final record = CourseRecord.fromSnapshot(data);
+      courseList.add(record.name);
+    });
+
+    setState(() {
+      processing = false;
+    });
+
+    courseList.sort((a, b) {
+      return a.toLowerCase().compareTo(b.toLowerCase());
+    });
+
+    print(courseList);
   }
 
   @override
   void initState() {
     super.initState();
-
-    //loadCourses();
-    namefieldController.text = record.name;
-    addressfieldController.text = record.address;
-    mobileController.text = record.mobileno;
-    optionalNoController.text = record.optionalno;
-    aadharfieldController.text = record.aadharno;
-    courseController.text = record.coursename;
-    batchController.text = record.batchtime;
-    photourl = record.imageurl;
-    _fromDay = record.dateofbirth.toDate();
-    addDate = record.addDate.toDate();
-    status = record.status;
-    courses = record.courses;
+    fetchCourseData();
+    setState(() {
+      namefieldController.text = record.name;
+      addressfieldController.text = record.address;
+      mobileController.text = record.mobileno;
+      optionalNoController.text = record.optionalno;
+      aadharfieldController.text = record.aadharno;
+      courseController.text = record.coursename;
+      batchController.text = record.batchtime;
+      photourl = record.imageurl;
+      dob = record.dateofbirth.toDate();
+      addDate = record.addDate.toDate();
+      status = record.status;
+      courses = record.courses;
+    });
 
     print(courses);
   }
 
-  _addCourse() async {
+  _addCourseDialogue() async {
+    String scourse = null;
     await showDialog<String>(
       context: context,
-      child: new AlertDialog(
+      child: AlertDialog(
         contentPadding: const EdgeInsets.all(16.0),
-        content: new Row(
-          children: <Widget>[
-            new Expanded(
-              child: new TextField(
-                onChanged: (String str) {
-                  setState(() {
-                    course = str;
-                  });
-                },
-                autofocus: true,
-                decoration: new InputDecoration(
-                    labelText: 'Course Name', hintText: 'eg. Java, C++'),
-              ),
-            )
-          ],
+        content: DropdownButton<String>(
+          hint: scourse == null ? Text('choose course') : Text(scourse),
+          value: scourse,
+          icon: Icon(Icons.arrow_drop_down),
+          iconSize: 24,
+          elevation: 16,
+          onChanged: (String str) {
+            setState(() {
+              scourse = str;
+              addCourseController.text = str;
+            });
+          },
+          items: courseList.map<DropdownMenuItem<String>>((String value) {
+            return DropdownMenuItem<String>(
+              value: value,
+              child: Text(value),
+            );
+          }).toList(),
         ),
         actions: <Widget>[
-          new FlatButton(
+          FlatButton(
               child: const Text('cancle'),
               onPressed: () {
                 Navigator.pop(context);
               }),
-          new FlatButton(
+          FlatButton(
               child: const Text('save'),
               onPressed: () {
-                if (course.length > 0) {
+                print('________You Entered___________' + courseController.text);
+                if (addCourseController.text.length > 0) {
                   addCourse();
                   Navigator.pop(context);
-                  print(course);
                 }
               })
         ],
@@ -217,6 +339,7 @@ class _StudentShowDetails extends State<StudentShowDetails> {
                                   editing
                                       ? Container(
                                           child: TextField(
+                                            controller: namefieldController,
                                             decoration: InputDecoration(
                                                 hintText: record.name),
                                           ),
@@ -249,6 +372,8 @@ class _StudentShowDetails extends State<StudentShowDetails> {
                                                 return Container(
                                                     margin: EdgeInsets.all(2),
                                                     child: Chip(
+                                                      deleteIconColor:
+                                                          Colors.white,
                                                       backgroundColor:
                                                           Colors.redAccent,
                                                       label: Text(
@@ -258,6 +383,15 @@ class _StudentShowDetails extends State<StudentShowDetails> {
                                                               color:
                                                                   Colors.white,
                                                               fontSize: 16.0)),
+                                                      onDeleted: () {
+                                                        setState(() {
+                                                          print(courses[index] +
+                                                              " removed !!");
+
+                                                          delCourse(
+                                                              courses[index]);
+                                                        });
+                                                      },
                                                     ));
                                               })
                                           : Container(),
@@ -267,85 +401,122 @@ class _StudentShowDetails extends State<StudentShowDetails> {
                               ),
                             ),
                             SizedBox(height: 10.0),
-                            Row(
-                              children: <Widget>[
-                                Expanded(
-                                  child: Column(
-                                    children: <Widget>[
-                                      Text(record.dateofbirth
-                                              .toDate()
-                                              .day
-                                              .toString() +
-                                          ' / ' +
-                                          record.dateofbirth
-                                              .toDate()
-                                              .month
-                                              .toString() +
-                                          ' / ' +
-                                          record.dateofbirth
-                                              .toDate()
-                                              .year
-                                              .toString()),
-                                      Text("DOB")
-                                    ],
-                                  ),
-                                ),
-                                Expanded(
-                                  child: Column(
-                                    children: <Widget>[
-                                      InkWell(
-                                        onTap: () {
-                                          print('hello');
-                                          _addCourse();
-                                        },
-                                        child: Chip(
-                                          label: Text(
-                                            '+ Course',
-                                            style:
-                                                TextStyle(color: Colors.white),
-                                          ),
-                                          backgroundColor: Colors.green,
+                            Container(
+                              child: Row(
+                                children: <Widget>[
+                                  Expanded(
+                                    child: InkWell(
+                                      onTap: () {
+                                        if (editing) {
+                                          DatePicker.showDatePicker(context,
+                                              showTitleActions: true,
+                                              minTime: DateTime(1960, 1, 1),
+                                              maxTime: DateTime.now(),
+                                              onChanged: (date) {
+                                            print('change $date');
+                                          }, onConfirm: (date) {
+                                            print('confirm $date');
+                                            setState(() {
+                                              dob = date;
+                                            });
+                                          },
+                                              currentTime: DateTime.now(),
+                                              locale: LocaleType.en);
+                                        }
+                                      },
+                                      child: Container(
+                                        child: Column(
+                                          children: <Widget>[
+                                            Container(
+                                              child: Text(dob.day.toString() +
+                                                  ' / ' +
+                                                  dob.month.toString() +
+                                                  ' / ' +
+                                                  dob.year.toString()),
+                                            ),
+                                            Text("DOB")
+                                          ],
                                         ),
-                                      )
-                                    ],
+                                      ),
+                                    ),
                                   ),
-                                ),
-                                Expanded(
-                                  child: Column(
-                                    children: <Widget>[
-                                      Text(record.addDate
-                                              .toDate()
-                                              .day
-                                              .toString() +
-                                          ' / ' +
-                                          record.addDate
-                                              .toDate()
-                                              .month
-                                              .toString() +
-                                          ' / ' +
-                                          record.addDate
-                                              .toDate()
-                                              .year
-                                              .toString()),
-                                      Text("Joined")
-                                    ],
+                                  Expanded(
+                                    child: Column(
+                                      children: <Widget>[
+                                        InkWell(
+                                          onTap: () {
+                                            print('hello');
+                                            _addCourseDialogue();
+                                          },
+                                          child: Chip(
+                                            label: Text(
+                                              '+ Course',
+                                              style: TextStyle(
+                                                  color: Colors.white),
+                                            ),
+                                            backgroundColor: Colors.green,
+                                          ),
+                                        )
+                                      ],
+                                    ),
                                   ),
-                                ),
-                              ],
+                                  Expanded(
+                                    child: InkWell(
+                                      onTap: () {
+                                        if (editing) {
+                                          DatePicker.showDatePicker(context,
+                                              showTitleActions: true,
+                                              minTime: DateTime(1960, 1, 1),
+                                              maxTime: DateTime.now(),
+                                              onChanged: (date) {
+                                            print('change $date');
+                                          }, onConfirm: (date) {
+                                            print('confirm $date');
+                                            setState(() {
+                                              addDate = date;
+                                            });
+                                          },
+                                              currentTime: DateTime.now(),
+                                              locale: LocaleType.en);
+                                        }
+                                      },
+                                      child: Container(
+                                        child: Column(
+                                          children: <Widget>[
+                                            Text(addDate.day.toString() +
+                                                ' / ' +
+                                                addDate.month.toString() +
+                                                ' / ' +
+                                                addDate.year.toString()),
+                                            Text("Joined")
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ],
                         ),
                       ),
-                      Container(
-                        height: 80,
-                        width: 80,
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10.0),
-                            image: DecorationImage(
-                                image:
-                                    CachedNetworkImageProvider(record.imageurl),
-                                fit: BoxFit.cover)),
-                        margin: EdgeInsets.only(left: 16.0),
+                      InkWell(
+                        onTap: () {
+                          setState(() {
+                            _showDialog(context);
+                          });
+                        },
+                        child: Container(
+                          height: 80,
+                          width: 80,
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10.0),
+                              image: DecorationImage(
+                                  image: CachedNetworkImageProvider(
+                                      record.imageurl),
+                                  fit: BoxFit.cover)),
+                          margin: EdgeInsets.only(left: 16.0),
+                        ),
                       ),
                     ],
                   ),
@@ -362,20 +533,11 @@ class _StudentShowDetails extends State<StudentShowDetails> {
                         ),
                         Divider(),
                         ListTile(
-                          title: Text("Email"),
-                          subtitle: editing
-                              ? TextField(
-                                  decoration: InputDecoration(
-                                      contentPadding: EdgeInsets.all(10),
-                                      hintText: 'student@gmail.com'),
-                                )
-                              : Text("student@gmail.com"),
-                          leading: Icon(Icons.email),
-                        ),
-                        ListTile(
                           title: Text("Phone"),
                           subtitle: editing
                               ? TextField(
+                                  keyboardType: TextInputType.number,
+                                  controller: mobileController,
                                   decoration: InputDecoration(
                                       contentPadding: EdgeInsets.all(10),
                                       hintText: record.mobileno),
@@ -387,6 +549,8 @@ class _StudentShowDetails extends State<StudentShowDetails> {
                           title: Text("Optional Number"),
                           subtitle: editing
                               ? TextField(
+                                  keyboardType: TextInputType.number,
+                                  controller: optionalNoController,
                                   decoration: InputDecoration(
                                       contentPadding: EdgeInsets.all(10),
                                       hintText: record.optionalno),
@@ -398,6 +562,7 @@ class _StudentShowDetails extends State<StudentShowDetails> {
                           title: Text("Address"),
                           subtitle: editing
                               ? TextField(
+                                  controller: addressfieldController,
                                   decoration: InputDecoration(
                                       contentPadding: EdgeInsets.all(10),
                                       hintText: record.address),
@@ -409,6 +574,8 @@ class _StudentShowDetails extends State<StudentShowDetails> {
                           title: Text("Aadhar Number"),
                           subtitle: editing
                               ? TextField(
+                                  keyboardType: TextInputType.number,
+                                  controller: aadharfieldController,
                                   decoration: InputDecoration(
                                       contentPadding: EdgeInsets.all(10),
                                       hintText: record.aadharno),
@@ -420,6 +587,7 @@ class _StudentShowDetails extends State<StudentShowDetails> {
                           title: Text("Batch Time"),
                           subtitle: editing
                               ? TextField(
+                                  controller: batchController,
                                   decoration: InputDecoration(
                                       contentPadding: EdgeInsets.all(10),
                                       hintText: record.batchtime),
@@ -444,6 +612,15 @@ class _StudentShowDetails extends State<StudentShowDetails> {
         child: editing ? Icon(Icons.done) : Icon(Icons.edit),
         onPressed: () {
           setState(() {
+            if (editing) {
+              print("name : " + namefieldController.text);
+              print("mob1 : " + mobileController.text);
+              print("mob2 : " + optionalNoController.text);
+              print("addr : " + addressfieldController.text);
+              print("aadhar : " + aadharfieldController.text);
+              print("batch: " + batchController.text);
+              update();
+            }
             editing = !editing;
           });
         },
@@ -451,28 +628,52 @@ class _StudentShowDetails extends State<StudentShowDetails> {
     );
   }
 
-  void addCourse() async {
-    List temp = List();
+// course ====================================================================
+
+  void delCourse(String course) async {
+    List clone = List();
+
     setState(() {
-      temp = courses;
+      clone.add(course);
     });
-    print('______________$temp');
-    setState(() {
-      temp.add(course);
-    });
-    print('______________$temp');
-    print(temp.length);
 
     Firestore.instance
         .collection('admission')
         .document(record.reference.documentID)
         .updateData({
-      'courses': temp,
+      'courses': FieldValue.arrayRemove(clone),
+    });
+  }
+
+  void addCourse() async {
+    List clone;
+
+    print('__________add course_________________');
+    setState(() {
+      if (courses != null) {
+        clone = []..addAll(courses);
+      } else {
+        clone = List();
+      }
+      clone.add(addCourseController.text.toString());
+    });
+    print('__________clone success_________________');
+
+    //if already array present in document_______________________
+
+    Firestore.instance
+        .collection('admission')
+        .document(record.reference.documentID)
+        .updateData({
+      'courses': FieldValue.arrayUnion(clone),
     });
 
-    setState(() {
-      course = '';
-    });
+    // Firestore.instance
+    //     .collection('admission')
+    //     .document(record.reference.documentID)
+    //     .setData({
+    //   'courses': clone,
+    // });
     //  Navigator.pop(context);
   }
 }

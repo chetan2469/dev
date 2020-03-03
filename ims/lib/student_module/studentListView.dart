@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:ims/data/record.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:ims/fancyFab.dart';
 import 'package:ims/student_module/addmission.dart';
-import 'package:ims/student_module/studentEditDetail.dart';
 import 'studentShowDetails.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:flutter_sms/flutter_sms.dart';
@@ -42,7 +42,10 @@ class _StudentListViewState extends State<StudentListView> {
       });
     } else if (searchBy == 'Admission') {
       filteredStudentList.sort((a, b) {
-        return a.addDate.toString().toLowerCase().compareTo(b.addDate.toString().toLowerCase());
+        return a.addDate
+            .toString()
+            .toLowerCase()
+            .compareTo(b.addDate.toString().toLowerCase());
       });
     } else if (searchBy == 'Course') {
       filteredStudentList.sort((a, b) {
@@ -75,7 +78,7 @@ class _StudentListViewState extends State<StudentListView> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    fetchStudentData();
+    _onRefresh();
   }
 
   void _sendSMS(String message, List<String> recipents) async {
@@ -90,6 +93,7 @@ class _StudentListViewState extends State<StudentListView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      //floatingActionButton: FancyFab(),
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.add),
         onPressed: () {
@@ -167,6 +171,10 @@ class _StudentListViewState extends State<StudentListView> {
                 }),
                 items: _dropDownMenuItems,
               ),
+            ),
+            Container(
+              padding: EdgeInsets.all(10),
+              child: Text(filteredStudentList.length.toString()),
             )
           ]),
       body: Center(
@@ -207,7 +215,7 @@ class _StudentListViewState extends State<StudentListView> {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 0, vertical: 1),
                       child: Container(
-                        height: 100,
+                        height: 80,
                         padding: EdgeInsets.only(top: 5),
                         margin: EdgeInsets.only(
                             top: 5, bottom: 1, left: 5, right: 5),
@@ -215,7 +223,7 @@ class _StudentListViewState extends State<StudentListView> {
                         decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(20),
                             border: Border.all(
-                                width: 2,
+                                width: 1,
                                 color: Colors.black45.withOpacity(0.3)),
                             color: Colors.white.withOpacity(0.2)),
                         //color: Colors.grey[200],,
@@ -223,20 +231,16 @@ class _StudentListViewState extends State<StudentListView> {
                           height: 80,
                           child: ListTile(
                               leading: Container(
-                                width: 60.0,
-                                height: 60.0,
-                                decoration: new BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  image: new DecorationImage(
-                                    fit: BoxFit.fill,
-                                    image: new CachedNetworkImageProvider(
-                                        filteredStudentList[i].imageurl),
-                                  ),
+                                child: CircleAvatar(
+                                  backgroundImage: CachedNetworkImageProvider(
+                                      filteredStudentList[i].imageurl),
                                 ),
                               ),
                               title: Text(
                                 filteredStudentList[i].name,
-                                style: TextStyle(fontSize: 20),
+                                style: filteredStudentList[i].name.length > 21
+                                    ? TextStyle(fontSize: 14)
+                                    : TextStyle(fontSize: 16),
                               ),
                               subtitle: Row(
                                 children: <Widget>[
@@ -244,39 +248,19 @@ class _StudentListViewState extends State<StudentListView> {
                                     backgroundColor:
                                         Colors.greenAccent.withOpacity(0.4),
                                     elevation: 6,
-                                    label: Text(filteredStudentList[i]
-                                                .coursename
-                                                .length <
-                                            8
-                                        ? filteredStudentList[i].coursename
-                                        : filteredStudentList[i]
-                                            .coursename
-                                            .substring(0, 5)),
+                                    label: Text(
+                                        filteredStudentList[i].courses != null
+                                            ? filteredStudentList[i]
+                                                .courses
+                                                .last
+                                                .toString()
+                                            : 'null'),
                                   ),
                                   SizedBox(
                                     width: 8,
                                   ),
-                                  Chip(
-                                    elevation: 6,
-                                    backgroundColor: filteredStudentList[i]
-                                                .batchtime
-                                                .toString()
-                                                .length <
-                                            12
-                                        ? Colors.greenAccent
-                                        : Colors.red[200],
-                                    label: filteredStudentList[i]
-                                                .batchtime
-                                                .toString()
-                                                .length <
-                                            12
-                                        ? Text(filteredStudentList[i]
-                                            .batchtime
-                                            .toString())
-                                        : Text('dynamic'),
-                                  ),
                                   SizedBox(
-                                    width: 6,
+                                    width: 8,
                                   ),
                                   InkWell(
                                     onTap: () {
@@ -300,36 +284,13 @@ class _StudentListViewState extends State<StudentListView> {
                                                   filteredStudentList[i])));
                                 });
                               },
-                              trailing: Column(
-                                children: <Widget>[
-                                  InkWell(
-                                      onTap: () {
-                                        setState(() {
-                                          Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      StudentDetails(
-                                                          filteredStudentList[
-                                                              i])));
-                                        });
-                                      },
-                                      child: Icon(
-                                        Icons.edit,
-                                        color: Colors.green,
-                                      )),
-                                  SizedBox(
-                                    height: 6,
-                                  ),
-                                  Container(
-                                    child: Icon(
-                                      Icons.donut_small,
-                                      color: filteredStudentList[i].status
-                                          ? Colors.green
-                                          : Colors.red,
-                                    ),
-                                  )
-                                ],
+                              trailing: Container(
+                                child: Icon(
+                                  Icons.donut_small,
+                                  color: filteredStudentList[i].status
+                                      ? Colors.green
+                                      : Colors.red,
+                                ),
                               )),
                         ),
                       ),
@@ -365,11 +326,13 @@ class _StudentListViewState extends State<StudentListView> {
     setState(() {
       processing = true;
       filteredStudentList.clear();
+      studentList.clear();
     });
     final QuerySnapshot result =
         await Firestore.instance.collection('admission').getDocuments();
 
     final List<DocumentSnapshot> documents = result.documents;
+
     documents.forEach((data) {
       final record = Record.fromSnapshot(data);
       studentList.add(record);
