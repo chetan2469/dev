@@ -20,7 +20,6 @@ class Record {
         assert(map['address'] != null),
         assert(map['mobileNo'] != null),
         assert(map['aadharNo'] != null),
-        assert(map['courseName'] != null),
         assert(map['batchTime'] != null),
         assert(map['imageUrl'] != null),
         name = map['name'],

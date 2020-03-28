@@ -348,6 +348,8 @@ class _StudentListViewState extends State<StudentListView> {
     });
   }
 
+  
+
   void contactDialogue(String mob) {
     showDialog(
         context: context,
