@@ -1,16 +1,17 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Record {
-  final List courses;
+  final List courses,receipts;
   final String name,
       address,
       mobileno,
       optionalno,
       aadharno,
-      coursename,
+      pursuing_course,
       batchtime,
       gender,
       imageurl;
+  final int outStandingAmount;
   Timestamp dateofbirth, addDate;
   bool status;
   final DocumentReference reference;
@@ -27,13 +28,15 @@ class Record {
         mobileno = map['mobileNo'],
         optionalno = map['optNumber'],
         aadharno = map['aadharNo'],
-        coursename = map['courseName'],
+        pursuing_course = map['pursuing_course'],
         batchtime = map['batchTime'],
         dateofbirth = map['dateOfBirth'],
         addDate = map['addDate'],
         status = map['status'],
         gender = map['gender'],
         courses = map['courses'],
+        receipts = map['receipts'],
+        outStandingAmount = map['outStandingAmount'],
         imageurl = map['imageUrl'];
 
   Record.fromSnapshot(DocumentSnapshot snapshot)
@@ -41,5 +44,5 @@ class Record {
 
   @override
   String toString() =>
-      "Record<$name:$address:$mobileno:$optionalno:$aadharno:$coursename:$batchtime:$dateofbirth:$imageurl>";
+      "Record<$name:$address:$mobileno:$optionalno:$aadharno:$pursuing_course:$batchtime:$dateofbirth:$imageurl>";
 }

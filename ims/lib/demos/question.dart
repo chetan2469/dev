@@ -6,8 +6,7 @@ class Question {
   String op1, op2, op3, op4, ans;
 
   Question(
-      {
-        this.id,
+      {this.id,
       this.question,
       this.op1,
       this.op2,
@@ -15,8 +14,6 @@ class Question {
       this.op4,
       this.ans,
       this.language});
-
-  
 
   factory Question.fromJson(Map<String, dynamic> json) {
     return new Question(

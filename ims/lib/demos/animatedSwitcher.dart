@@ -16,6 +16,7 @@ Widget _redBox() {
 
 class _AnimatedSwitcherDemoState extends State<AnimatedSwitcherDemo> {
   int _count = 0;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

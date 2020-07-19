@@ -105,19 +105,20 @@ class _UploadImageState extends State<UploadImage> {
           ),
           RaisedButton(
             child: Text("Camera"),
-            onPressed: (){
+            onPressed: () {
               _pickImageFromCamera();
             },
           ),
           RaisedButton(
             child: Text("Upload"),
-            onPressed: (){
+            onPressed: () {
               uploadFile();
             },
           )
         ],
       ),
-      body: _imageFile!=null?Image.file(_imageFile):Image.network(photourl),
+      body:
+          _imageFile != null ? Image.file(_imageFile) : Image.network(photourl),
     );
   }
 }

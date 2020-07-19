@@ -5,8 +5,15 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:ims/courseModule/addCourseEntry.dart';
+import 'package:ims/courseModule/editStudentCourseEntry.dart';
 import 'package:ims/data/course_record.dart';
+import 'package:ims/data/receiptEntry.dart';
 import 'package:ims/data/record.dart';
+import 'package:ims/data/studentCourseEntry.dart';
+import 'package:ims/firebaseArrayCRUD/studentCourse.dart';
+import 'package:ims/receiptModule/addReceipt.dart';
+import 'package:ims/receiptModule/editReceipt.dart';
 import 'package:ims/viewImage.dart';
 import 'package:intl/intl.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -16,6 +23,7 @@ class StudentShowDetails extends StatefulWidget {
   final Record record;
 
   StudentShowDetails(this.record);
+
   @override
   _StudentShowDetails createState() => _StudentShowDetails(record);
 }
@@ -23,6 +31,7 @@ class StudentShowDetails extends StatefulWidget {
 class _StudentShowDetails extends State<StudentShowDetails> {
   final Record record;
   final List<int> numbers = [1, 2, 3, 5, 8, 13, 21, 34, 55];
+
   _StudentShowDetails(this.record);
 
   TextEditingController namefieldController = TextEditingController();
@@ -33,6 +42,7 @@ class _StudentShowDetails extends State<StudentShowDetails> {
   TextEditingController courseController = TextEditingController();
   TextEditingController batchController = TextEditingController();
   TextEditingController addCourseController = TextEditingController();
+  TextEditingController outStandingAmountController = TextEditingController();
 
   bool validator1 = true,
       validator2 = true,
@@ -50,11 +60,73 @@ class _StudentShowDetails extends State<StudentShowDetails> {
   File _imageFile;
   String photourl, downurl;
   bool flag = true;
-  List courses = List();
-  List<String> courseList = List();
+  int outStandingAmount;
+
+  List selectedCoursesReferences = List();
+  List<StudentCourseEntry> selectedCourses = List();
+
+  List selectedStudentReceiptReferences = List();
+  List<ReceiptEntry> studentReceiptList = List();
+
+  @override
+  void initState() {
+    super.initState();
+    setState(() {
+      processing = true;
+      namefieldController.text = record.name;
+      addressfieldController.text = record.address;
+      mobileController.text = record.mobileno;
+      optionalNoController.text = record.optionalno;
+      aadharfieldController.text = record.aadharno;
+      courseController.text = record.pursuing_course;
+      batchController.text = record.batchtime;
+      photourl = record.imageurl;
+      dob = record.dateofbirth.toDate();
+      addDate = record.addDate.toDate();
+      status = record.status;
+      selectedCoursesReferences = []..addAll(record.courses);
+      selectedStudentReceiptReferences = []..addAll(record.receipts);
+      outStandingAmount = record.outStandingAmount;
+    });
+
+    print(selectedCoursesReferences);
+    print(selectedStudentReceiptReferences);
+
+    fetchLists();
+
+    setState(() {
+      processing = false;
+    });
+  }
+
+  void fetchLists() async {
+    //fetch receipts and courses list from array refrences
+    for (var i = 0; i < selectedCoursesReferences.length; i++) {
+      Firestore.instance
+          .collection('student_course')
+          .document(selectedCoursesReferences[i].toString())
+          .get()
+          .then((DocumentSnapshot ds) {
+        setState(() {
+          selectedCourses.add(StudentCourseEntry.fromSnapshot(ds));
+        });
+      });
+    }
+
+    for (var i = 0; i < selectedStudentReceiptReferences.length; i++) {
+      Firestore.instance
+          .collection('receipts')
+          .document(selectedStudentReceiptReferences[i].toString())
+          .get()
+          .then((DocumentSnapshot ds) {
+        setState(() {
+          studentReceiptList.add(ReceiptEntry.fromSnapshot(ds));
+        });
+      });
+    }
+  }
 
   Future<Null> _pickImageFromGallery() async {
-    print("___________________________________________");
     File imageFile = await ImagePicker.pickImage(source: ImageSource.gallery);
     imageFile = await compressFile(imageFile, imageFile.path);
     setState(() {
@@ -65,7 +137,6 @@ class _StudentShowDetails extends State<StudentShowDetails> {
   }
 
   Future<Null> _pickImageFromCamera() async {
-    print("___________________________________________");
     File imageFile = await ImagePicker.pickImage(source: ImageSource.camera);
     imageFile = await compressFile(imageFile, imageFile.path);
     setState(() {
@@ -76,8 +147,6 @@ class _StudentShowDetails extends State<StudentShowDetails> {
   }
 
   Future<File> compressFile(File file, String targetPath) async {
-    print(file.lengthSync().toString() + "________________FILE______________");
-
     var result = await FlutterImageCompress.compressAndGetFile(
         file.absolute.path, targetPath,
         quality: 60, minHeight: 400, minWidth: 400);
@@ -86,6 +155,99 @@ class _StudentShowDetails extends State<StudentShowDetails> {
         "________________COMPRESS FILE______________");
 
     return result;
+  }
+
+  deleteCourseChip(int index) {
+    setState(() {
+      print(selectedCourses[index].course_name + " removed !!");
+      Firestore.instance
+          .collection('student_course')
+          .document(selectedCourses[index].reference.documentID)
+          .delete()
+          .catchError((onError) {
+        print(onError);
+      });
+      //delete from firestore
+
+      delCourse(selectedCoursesReferences[index].toString());
+
+      selectedCourses.removeAt(index);
+      selectedCoursesReferences.removeAt(index);
+    });
+  }
+
+  Future<void> chipOptions(int index) async {
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return SimpleDialog(
+          children: <Widget>[
+            InkWell(
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => EditStudentCourseEntry(
+                            selectedCoursesReferences[index].toString())));
+              },
+              child: ListTile(
+                leading: Icon(
+                  Icons.info,
+                  color: Colors.green,
+                ),
+                title: Text(
+                  'View Info',
+                  style: TextStyle(fontSize: 18),
+                ),
+              ),
+            ),
+            InkWell(
+              onTap: () {
+                Navigator.pop(context);
+                if (selectedCourses.length > 1 &&
+                    selectedCoursesReferences.length > 1) {
+                  deleteCourseChip(index);
+                } else {
+                  _showAlert(
+                      "Student atleast have one course entry if you want to delete one then you should add anather entry first");
+                }
+              },
+              child: ListTile(
+                leading: Icon(
+                  Icons.delete_forever,
+                  color: Colors.red,
+                ),
+                title: Text(
+                  'Delete Course',
+                  style: TextStyle(fontSize: 18),
+                ),
+              ),
+            )
+          ],
+        );
+      },
+    );
+  }
+
+  void _showAlert(String msg) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Alert !!'),
+          content: Text(msg),
+          actions: <Widget>[
+            new FlatButton(
+              child: new Text("ok"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   _showDialog(BuildContext context) async {
@@ -167,17 +329,6 @@ class _StudentShowDetails extends State<StudentShowDetails> {
     print(photourl);
   }
 
-  loadCourses() async {
-    DocumentReference docRef = Firestore.instance
-        .collection('admission')
-        .document(record.reference.toString());
-    DocumentSnapshot doc = await docRef.get();
-
-    setState(() {
-      courses = doc.data['courses'];
-    });
-  }
-
   void update() async {
     await Firestore.instance
         .collection('admission')
@@ -194,6 +345,8 @@ class _StudentShowDetails extends State<StudentShowDetails> {
       'dateOfBirth': dob,
       'addDate': addDate,
       'status': status,
+      'outStandingAmountController': outStandingAmountController.text,
+      'courses': selectedCoursesReferences,
     });
     showDialog(
         context: context,
@@ -204,431 +357,579 @@ class _StudentShowDetails extends State<StudentShowDetails> {
     print('Update Successfully !!');
   }
 
-  fetchCourseData() async {
+  updateReceiptList(ReceiptEntry receiptEntry) {
     setState(() {
-      processing = true;
-      courseList.clear();
-    });
-    final QuerySnapshot result =
-        await Firestore.instance.collection('courses').getDocuments();
+      selectedStudentReceiptReferences.add(receiptEntry.reference.documentID);
+      studentReceiptList.add(receiptEntry);
 
-    final List<DocumentSnapshot> documents = result.documents;
-    documents.forEach((data) {
-      final record = CourseRecord.fromSnapshot(data);
-      courseList.add(record.name);
+      outStandingAmount = outStandingAmount - receiptEntry.paying_amount;
     });
 
-    setState(() {
-      processing = false;
-    });
+    print("studentReceiptList     :   " +
+        selectedStudentReceiptReferences.toString());
 
-    courseList.sort((a, b) {
-      return a.toLowerCase().compareTo(b.toLowerCase());
-    });
+    Firestore.instance
+        .collection('admission')
+        .document(record.reference.documentID)
+        .updateData({'receipts': selectedStudentReceiptReferences});
 
-    print(courseList);
+    Firestore.instance
+        .collection('admission')
+        .document(record.reference.documentID)
+        .updateData({'outStandingAmount': outStandingAmount});
   }
 
-  @override
-  void initState() {
-    super.initState();
-    fetchCourseData();
+  updateCourseList(StudentCourseEntry studentCourseEntry) {
     setState(() {
-      namefieldController.text = record.name;
-      addressfieldController.text = record.address;
-      mobileController.text = record.mobileno;
-      optionalNoController.text = record.optionalno;
-      aadharfieldController.text = record.aadharno;
-      courseController.text = record.coursename;
-      batchController.text = record.batchtime;
-      photourl = record.imageurl;
-      dob = record.dateofbirth.toDate();
-      addDate = record.addDate.toDate();
-      status = record.status;
-      courses = record.courses;
+      selectedCoursesReferences.add(studentCourseEntry.reference.documentID);
+      selectedCourses.add(studentCourseEntry);
+
+      outStandingAmount =
+          outStandingAmount + int.parse(studentCourseEntry.course_fees);
     });
 
-    print(courses);
+    print("selectedCourses     :   " + selectedCourses.toString());
+
+    Firestore.instance
+        .collection('admission')
+        .document(record.reference.documentID)
+        .updateData({'courses': selectedCoursesReferences});
+
+    Firestore.instance
+        .collection('admission')
+        .document(record.reference.documentID)
+        .updateData({'outStandingAmount': outStandingAmount});
   }
 
-  _addCourseDialogue() async {
-    String scourse = null;
-    await showDialog<String>(
+  updateOutStandingAmount(int amt) {
+    setState(() {
+      outStandingAmount = amt;
+    });
+
+    for (var course in selectedCourses) {
+      setState(() {
+        outStandingAmount =
+            outStandingAmount + int.parse(course.course_total_fees);
+      });
+    }
+    print(outStandingAmount);
+    addCourseList();
+  }
+
+  void addCourseList() async {
+    List clone;
+
+    print('__________add course_________________');
+    setState(() {
+      if (selectedCoursesReferences != null) {
+        clone = []..addAll(selectedCoursesReferences);
+      } else {
+        clone = List();
+      }
+      clone.add(addCourseController.text.toString());
+    });
+
+    setState(() {
+      clone.remove('');
+    });
+
+    print('__________clone success_________________' + clone.toString());
+
+    Firestore.instance
+        .collection('admission')
+        .document(record.reference.documentID)
+        .updateData({
+      'courses': FieldValue.arrayUnion(clone),
+      'outStandingAmount': outStandingAmount,
+    });
+  }
+
+  Future<void> _neverSatisfied() async {
+    return showDialog<void>(
       context: context,
-      child: AlertDialog(
-        contentPadding: const EdgeInsets.all(16.0),
-        content: DropdownButton<String>(
-          hint: scourse == null ? Text('choose course') : Text(scourse),
-          value: scourse,
-          icon: Icon(Icons.arrow_drop_down),
-          iconSize: 24,
-          elevation: 16,
-          onChanged: (String str) {
-            setState(() {
-              scourse = str;
-              addCourseController.text = str;
-            });
-          },
-          items: courseList.map<DropdownMenuItem<String>>((String value) {
-            return DropdownMenuItem<String>(
-              value: value,
-              child: Text(value),
-            );
-          }).toList(),
-        ),
-        actions: <Widget>[
-          FlatButton(
-              child: const Text('cancle'),
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Warning !!'),
+          content: SingleChildScrollView(
+            child: Text(
+                'You should add atleast single course entry for student .'),
+          ),
+          actions: <Widget>[
+            FlatButton(
+              child: Text('ok'),
               onPressed: () {
-                Navigator.pop(context);
-              }),
-          FlatButton(
-              child: const Text('save'),
-              onPressed: () {
-                print('________You Entered___________' + courseController.text);
-                if (addCourseController.text.length > 0) {
-                  addCourse();
-                  Navigator.pop(context);
-                }
-              })
-        ],
-      ),
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.grey.shade300,
-      body: SingleChildScrollView(
-        child: Stack(
-          children: <Widget>[
-            InkWell(
-              onTap: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => ViewImage(photourl)));
-              },
-              child: SizedBox(
-                height: 280,
-                width: double.infinity,
-                child: PNetworkImage(record.imageurl, fit: BoxFit.cover),
-              ),
-            ),
-            Container(
-              margin: EdgeInsets.fromLTRB(16.0, 250.0, 16.0, 16.0),
-              child: Column(
-                children: <Widget>[
-                  Stack(
-                    children: <Widget>[
-                      Container(
-                        padding: EdgeInsets.all(16.0),
-                        margin: EdgeInsets.only(top: 16.0),
-                        decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(5.0)),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            Container(
-                              margin: EdgeInsets.only(left: 96.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: <Widget>[
-                                  editing
-                                      ? Container(
-                                          child: TextField(
-                                            controller: namefieldController,
-                                            decoration: InputDecoration(
-                                                hintText: record.name),
-                                          ),
-                                        )
-                                      : ListTile(
-                                          leading: Text(
-                                            record.name,
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .title,
-                                          ),
-                                          trailing: Container(
-                                            width: 10,
-                                            color: record.status
-                                                ? Colors.green
-                                                : Colors.red,
-                                          ),
-                                        ),
-                                  ListTile(
-                                    contentPadding: EdgeInsets.all(0),
-                                    subtitle: Container(
-                                      height:
-                                          MediaQuery.of(context).size.height *
-                                              0.07,
-                                      child: courses != null
-                                          ? ListView.builder(
-                                              scrollDirection: Axis.horizontal,
-                                              itemCount: courses.length,
-                                              itemBuilder: (context, index) {
-                                                return Container(
-                                                    margin: EdgeInsets.all(2),
-                                                    child: Chip(
-                                                      deleteIconColor:
-                                                          Colors.white,
-                                                      backgroundColor:
-                                                          Colors.redAccent,
-                                                      label: Text(
-                                                          courses[index]
-                                                              .toString(),
-                                                          style: TextStyle(
-                                                              color:
-                                                                  Colors.white,
-                                                              fontSize: 16.0)),
-                                                      onDeleted: () {
-                                                        setState(() {
-                                                          print(courses[index] +
-                                                              " removed !!");
-
-                                                          delCourse(
-                                                              courses[index]);
-                                                        });
-                                                      },
-                                                    ));
-                                              })
-                                          : Container(),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            SizedBox(height: 10.0),
-                            Container(
-                              child: Row(
-                                children: <Widget>[
-                                  Expanded(
-                                    child: InkWell(
-                                      onTap: () {
-                                        if (editing) {
-                                          DatePicker.showDatePicker(context,
-                                              showTitleActions: true,
-                                              minTime: DateTime(1960, 1, 1),
-                                              maxTime: DateTime.now(),
-                                              onChanged: (date) {
-                                            print('change $date');
-                                          }, onConfirm: (date) {
-                                            print('confirm $date');
-                                            setState(() {
-                                              dob = date;
-                                            });
-                                          },
-                                              currentTime: DateTime.now(),
-                                              locale: LocaleType.en);
-                                        }
-                                      },
-                                      child: Container(
-                                        child: Column(
-                                          children: <Widget>[
-                                            Container(
-                                              child: Text(dob.day.toString() +
-                                                  ' / ' +
-                                                  dob.month.toString() +
-                                                  ' / ' +
-                                                  dob.year.toString()),
+    return WillPopScope(
+      onWillPop: () {
+        if (selectedCoursesReferences.length > 0) {
+          Navigator.pop(context);
+        } else {
+          _neverSatisfied();
+        }
+      },
+      child: Scaffold(
+        backgroundColor: Colors.grey.shade300,
+        body: processing == false
+            ? SingleChildScrollView(
+                child: Stack(
+                  children: <Widget>[
+                    InkWell(
+                      onTap: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => ViewImage(photourl)));
+                      },
+                      child: SizedBox(
+                        height: 280,
+                        width: double.infinity,
+                        child:
+                            PNetworkImage(record.imageurl, fit: BoxFit.cover),
+                      ),
+                    ),
+                    Container(
+                      margin: EdgeInsets.fromLTRB(16.0, 250.0, 16.0, 16.0),
+                      child: Column(
+                        children: <Widget>[
+                          Stack(
+                            children: <Widget>[
+                              Container(
+                                padding: EdgeInsets.all(16.0),
+                                margin: EdgeInsets.only(top: 16.0),
+                                decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(5.0)),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: <Widget>[
+                                    Container(
+                                      margin: EdgeInsets.only(left: 96.0),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: <Widget>[
+                                          editing
+                                              ? Container(
+                                                  child: TextField(
+                                                    controller:
+                                                        namefieldController,
+                                                    decoration: InputDecoration(
+                                                        hintText: record.name),
+                                                  ),
+                                                )
+                                              : ListTile(
+                                                  leading: Text(
+                                                    record.name,
+                                                    style: Theme.of(context)
+                                                        .textTheme
+                                                        .title,
+                                                  ),
+                                                  trailing: Container(
+                                                    width: 10,
+                                                    color: record.status
+                                                        ? Colors.green
+                                                        : Colors.red,
+                                                  ),
+                                                ),
+                                          ListTile(
+                                            contentPadding: EdgeInsets.all(0),
+                                            subtitle: Container(
+                                              height: MediaQuery.of(context)
+                                                      .size
+                                                      .height *
+                                                  0.07,
+                                              child: selectedCourses != null
+                                                  ? ListView.builder(
+                                                      scrollDirection:
+                                                          Axis.horizontal,
+                                                      itemCount: selectedCourses
+                                                          .length,
+                                                      itemBuilder:
+                                                          (context, index) {
+                                                        return Container(
+                                                            margin:
+                                                                EdgeInsets.all(
+                                                                    2),
+                                                            child: ActionChip(
+                                                                avatar:
+                                                                    CircleAvatar(
+                                                                  backgroundColor:
+                                                                      Colors
+                                                                          .red,
+                                                                  child: Text(selectedCourses[
+                                                                          index]
+                                                                      .course_name
+                                                                      .toString()[0]),
+                                                                ),
+                                                                label: Text(
+                                                                    selectedCourses[
+                                                                            index]
+                                                                        .course_name
+                                                                        .toString(),
+                                                                    style: TextStyle(
+                                                                        fontSize:
+                                                                            16.0)),
+                                                                onPressed: () {
+                                                                  chipOptions(
+                                                                      index);
+                                                                }));
+                                                      })
+                                                  : Container(),
                                             ),
-                                            Text("DOB")
-                                          ],
-                                        ),
+                                          ),
+                                        ],
                                       ),
                                     ),
+                                    SizedBox(height: 10.0),
+                                    Container(
+                                      child: Row(
+                                        children: <Widget>[
+                                          Expanded(
+                                            child: InkWell(
+                                              onTap: () {
+                                                if (editing) {
+                                                  DatePicker.showDatePicker(
+                                                      context,
+                                                      showTitleActions: true,
+                                                      minTime:
+                                                          DateTime(1960, 1, 1),
+                                                      maxTime: DateTime.now(),
+                                                      onChanged: (date) {
+                                                    print('change $date');
+                                                  }, onConfirm: (date) {
+                                                    print('confirm $date');
+                                                    setState(() {
+                                                      dob = date;
+                                                    });
+                                                  },
+                                                      currentTime:
+                                                          DateTime.now(),
+                                                      locale: LocaleType.en);
+                                                }
+                                              },
+                                              child: Container(
+                                                child: Column(
+                                                  children: <Widget>[
+                                                    Container(
+                                                      child: Text(dob.day
+                                                              .toString() +
+                                                          ' / ' +
+                                                          dob.month.toString() +
+                                                          ' / ' +
+                                                          dob.year.toString()),
+                                                    ),
+                                                    Text("DOB")
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                          Expanded(
+                                            child: Column(
+                                              children: <Widget>[
+                                                InkWell(
+                                                  onTap: () {
+                                                    print('hello');
+                                                    Navigator.push(
+                                                        context,
+                                                        MaterialPageRoute(
+                                                            builder: (context) =>
+                                                                AddCourseEntry(
+                                                                  updateCourseList,
+                                                                  addDate,
+                                                                )));
+                                                  },
+                                                  child: Chip(
+                                                    label: Text(
+                                                      '+ Course',
+                                                      style: TextStyle(
+                                                          color: Colors.white),
+                                                    ),
+                                                    backgroundColor:
+                                                        Colors.green,
+                                                  ),
+                                                )
+                                              ],
+                                            ),
+                                          ),
+                                          Expanded(
+                                            child: InkWell(
+                                              onTap: () {
+                                                if (editing) {
+                                                  DatePicker.showDatePicker(
+                                                      context,
+                                                      showTitleActions: true,
+                                                      minTime:
+                                                          DateTime(1960, 1, 1),
+                                                      maxTime: DateTime.now(),
+                                                      onChanged: (date) {
+                                                    print('change $date');
+                                                  }, onConfirm: (date) {
+                                                    print('confirm $date');
+                                                    setState(() {
+                                                      addDate = date;
+                                                    });
+                                                  },
+                                                      currentTime:
+                                                          DateTime.now(),
+                                                      locale: LocaleType.en);
+                                                }
+                                              },
+                                              child: Container(
+                                                child: Column(
+                                                  children: <Widget>[
+                                                    Text(
+                                                        addDate.day.toString() +
+                                                            ' / ' +
+                                                            addDate.month
+                                                                .toString() +
+                                                            ' / ' +
+                                                            addDate.year
+                                                                .toString()),
+                                                    Text("Joined")
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              InkWell(
+                                onTap: () {
+                                  setState(() {
+                                    _showDialog(context);
+                                  });
+                                },
+                                child: Container(
+                                  height: 80,
+                                  width: 80,
+                                  decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(10.0),
+                                      image: DecorationImage(
+                                          image: CachedNetworkImageProvider(
+                                              record.imageurl),
+                                          fit: BoxFit.cover)),
+                                  margin: EdgeInsets.only(left: 16.0),
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 20.0),
+                          Container(
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(5.0),
+                            ),
+                            child: Column(
+                              children: <Widget>[
+                                ListTile(
+                                  title: Text("Student Information"),
+                                ),
+                                Divider(),
+                                ListTile(
+                                  title: Text("Phone"),
+                                  subtitle: editing
+                                      ? TextField(
+                                          keyboardType: TextInputType.number,
+                                          controller: mobileController,
+                                          decoration: InputDecoration(
+                                              contentPadding:
+                                                  EdgeInsets.all(10),
+                                              hintText: record.mobileno),
+                                        )
+                                      : Text(record.mobileno),
+                                  leading: Icon(Icons.phone),
+                                ),
+                                ListTile(
+                                  title: Text("Optional Number"),
+                                  subtitle: editing
+                                      ? TextField(
+                                          keyboardType: TextInputType.number,
+                                          controller: optionalNoController,
+                                          decoration: InputDecoration(
+                                              contentPadding:
+                                                  EdgeInsets.all(10),
+                                              hintText: record.optionalno),
+                                        )
+                                      : Text(record.optionalno),
+                                  leading: Icon(Icons.call),
+                                ),
+                                ListTile(
+                                  title: Text("Address"),
+                                  subtitle: editing
+                                      ? TextField(
+                                          controller: addressfieldController,
+                                          decoration: InputDecoration(
+                                              contentPadding:
+                                                  EdgeInsets.all(10),
+                                              hintText: record.address),
+                                        )
+                                      : Text(record.address),
+                                  leading: Icon(Icons.confirmation_number),
+                                ),
+                                ListTile(
+                                  title: Text("Aadhar Number"),
+                                  subtitle: editing
+                                      ? TextField(
+                                          keyboardType: TextInputType.number,
+                                          controller: aadharfieldController,
+                                          decoration: InputDecoration(
+                                              contentPadding:
+                                                  EdgeInsets.all(10),
+                                              hintText: record.aadharno),
+                                        )
+                                      : Text(record.aadharno),
+                                  leading: Icon(Icons.confirmation_number),
+                                ),
+                                ListTile(
+                                  title: Text("Batch Time"),
+                                  subtitle: editing
+                                      ? TextField(
+                                          controller: batchController,
+                                          decoration: InputDecoration(
+                                              contentPadding:
+                                                  EdgeInsets.all(10),
+                                              hintText: record.batchtime),
+                                        )
+                                      : Text(record.batchtime),
+                                  leading: Icon(Icons.person),
+                                ),
+                                Divider(),
+                                ListTile(
+                                  subtitle: TextField(
+                                    enabled: false,
+                                    controller: outStandingAmountController,
+                                    decoration: InputDecoration(
+                                        hintText: outStandingAmount.toString()),
                                   ),
-                                  Expanded(
-                                    child: Column(
-                                      children: <Widget>[
-                                        InkWell(
-                                          onTap: () {
-                                            print('hello');
-                                            _addCourseDialogue();
-                                          },
-                                          child: Chip(
+                                  leading: Icon(Icons.monetization_on),
+                                ),
+                              ],
+                            ),
+                          ),
+                          SizedBox(height: 20.0),
+                          Container(
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(5.0),
+                            ),
+                            child: Column(
+                              children: <Widget>[
+                                ListTile(
+                                    title: Text("Fees Receipts"),
+                                    trailing: InkWell(
+                                        onTap: () {
+                                          Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      AddReceipt(
+                                                          selectedCourses,
+                                                          DateTime.now(),
+                                                          record.reference,
+                                                          outStandingAmount,
+                                                          updateOutStandingAmount,
+                                                          updateReceiptList)));
+                                        },
+                                        child: Chip(
+                                            backgroundColor: Colors.green,
                                             label: Text(
-                                              '+ Course',
+                                              '+ add ',
                                               style: TextStyle(
                                                   color: Colors.white),
-                                            ),
-                                            backgroundColor: Colors.green,
-                                          ),
-                                        )
-                                      ],
-                                    ),
-                                  ),
-                                  Expanded(
-                                    child: InkWell(
-                                      onTap: () {
-                                        if (editing) {
-                                          DatePicker.showDatePicker(context,
-                                              showTitleActions: true,
-                                              minTime: DateTime(1960, 1, 1),
-                                              maxTime: DateTime.now(),
-                                              onChanged: (date) {
-                                            print('change $date');
-                                          }, onConfirm: (date) {
-                                            print('confirm $date');
-                                            setState(() {
-                                              addDate = date;
-                                            });
-                                          },
-                                              currentTime: DateTime.now(),
-                                              locale: LocaleType.en);
-                                        }
-                                      },
-                                      child: Container(
-                                        child: Column(
-                                          children: <Widget>[
-                                            Text(addDate.day.toString() +
-                                                ' / ' +
-                                                addDate.month.toString() +
-                                                ' / ' +
-                                                addDate.year.toString()),
-                                            Text("Joined")
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
+                                            )))),
+                                Divider(),
+                                studentReceiptList != null
+                                    ? Container(
+                                        height: studentReceiptList.length *
+                                                60.toDouble() +
+                                            40,
+                                        child: receiptsListBuilder(),
+                                      )
+                                    : Container(),
+                                SizedBox(
+                                  height: 50,
+                                )
+                              ],
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
-                      InkWell(
-                        onTap: () {
-                          setState(() {
-                            _showDialog(context);
-                          });
-                        },
-                        child: Container(
-                          height: 80,
-                          width: 80,
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10.0),
-                              image: DecorationImage(
-                                  image: CachedNetworkImageProvider(
-                                      record.imageurl),
-                                  fit: BoxFit.cover)),
-                          margin: EdgeInsets.only(left: 16.0),
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 20.0),
-                  Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(5.0),
                     ),
-                    child: Column(
-                      children: <Widget>[
-                        ListTile(
-                          title: Text("Student Information"),
-                        ),
-                        Divider(),
-                        ListTile(
-                          title: Text("Phone"),
-                          subtitle: editing
-                              ? TextField(
-                                  keyboardType: TextInputType.number,
-                                  controller: mobileController,
-                                  decoration: InputDecoration(
-                                      contentPadding: EdgeInsets.all(10),
-                                      hintText: record.mobileno),
-                                )
-                              : Text(record.mobileno),
-                          leading: Icon(Icons.phone),
-                        ),
-                        ListTile(
-                          title: Text("Optional Number"),
-                          subtitle: editing
-                              ? TextField(
-                                  keyboardType: TextInputType.number,
-                                  controller: optionalNoController,
-                                  decoration: InputDecoration(
-                                      contentPadding: EdgeInsets.all(10),
-                                      hintText: record.optionalno),
-                                )
-                              : Text(record.optionalno),
-                          leading: Icon(Icons.call),
-                        ),
-                        ListTile(
-                          title: Text("Address"),
-                          subtitle: editing
-                              ? TextField(
-                                  controller: addressfieldController,
-                                  decoration: InputDecoration(
-                                      contentPadding: EdgeInsets.all(10),
-                                      hintText: record.address),
-                                )
-                              : Text(record.address),
-                          leading: Icon(Icons.confirmation_number),
-                        ),
-                        ListTile(
-                          title: Text("Aadhar Number"),
-                          subtitle: editing
-                              ? TextField(
-                                  keyboardType: TextInputType.number,
-                                  controller: aadharfieldController,
-                                  decoration: InputDecoration(
-                                      contentPadding: EdgeInsets.all(10),
-                                      hintText: record.aadharno),
-                                )
-                              : Text(record.aadharno),
-                          leading: Icon(Icons.confirmation_number),
-                        ),
-                        ListTile(
-                          title: Text("Batch Time"),
-                          subtitle: editing
-                              ? TextField(
-                                  controller: batchController,
-                                  decoration: InputDecoration(
-                                      contentPadding: EdgeInsets.all(10),
-                                      hintText: record.batchtime),
-                                )
-                              : Text(record.batchtime),
-                          leading: Icon(Icons.person),
-                        ),
-                      ],
-                    ),
-                  )
-                ],
+                  ],
+                ),
+              )
+            : Center(
+                child: CircularProgressIndicator(),
               ),
-            ),
-            AppBar(
-              backgroundColor: Colors.transparent,
-              elevation: 0,
-            )
-          ],
+        floatingActionButton: FloatingActionButton(
+          child: editing ? Icon(Icons.done) : Icon(Icons.edit),
+          onPressed: () {
+            setState(() {
+              if (editing) {
+                print("name : " + namefieldController.text);
+                print("mob1 : " + mobileController.text);
+                print("mob2 : " + optionalNoController.text);
+                print("addr : " + addressfieldController.text);
+                print("aadhar : " + aadharfieldController.text);
+                print("batch: " + batchController.text);
+                update();
+              }
+              editing = !editing;
+            });
+          },
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        child: editing ? Icon(Icons.done) : Icon(Icons.edit),
-        onPressed: () {
-          setState(() {
-            if (editing) {
-              print("name : " + namefieldController.text);
-              print("mob1 : " + mobileController.text);
-              print("mob2 : " + optionalNoController.text);
-              print("addr : " + addressfieldController.text);
-              print("aadhar : " + aadharfieldController.text);
-              print("batch: " + batchController.text);
-              update();
-            }
-            editing = !editing;
-          });
-        },
       ),
     );
   }
 
-// course ====================================================================
+  Widget receiptsListBuilder() {
+    return ListView.builder(
+      itemCount: studentReceiptList.length,
+      itemBuilder: (context, index) {
+        return Container(
+          decoration: BoxDecoration(
+              border: Border.all(color: Colors.grey.withOpacity(.1))),
+          margin: EdgeInsets.only(bottom: 5),
+          child: ListTile(
+            leading:
+                studentReceiptList[index].payment_method.toString() == 'Cash'
+                    ? Icon(Icons.monetization_on)
+                    : Icon(Icons.wifi),
+            title: Text(studentReceiptList[index].paying_amount.toString()),
+            subtitle: studentReceiptList[index].receipt_date != null
+                ? Text(
+                    studentReceiptList[index].receipt_date.toDate().toString())
+                : Text('today'),
+            trailing: IconButton(
+                icon: Icon(Icons.edit),
+                onPressed: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) =>
+                            EditReceipt(studentReceiptList[index])))),
+          ),
+        );
+      },
+    );
+  }
+
+  // course ====================================================================
 
   void delCourse(String course) async {
     List clone = List();
@@ -644,38 +945,6 @@ class _StudentShowDetails extends State<StudentShowDetails> {
       'courses': FieldValue.arrayRemove(clone),
     });
   }
-
-  void addCourse() async {
-    List clone;
-
-    print('__________add course_________________');
-    setState(() {
-      if (courses != null) {
-        clone = []..addAll(courses);
-      } else {
-        clone = List();
-      }
-      clone.add(addCourseController.text.toString());
-    });
-    print('__________clone success_________________');
-
-    //if already array present in document_______________________
-
-    Firestore.instance
-        .collection('admission')
-        .document(record.reference.documentID)
-        .updateData({
-      'courses': FieldValue.arrayUnion(clone),
-    });
-
-    // Firestore.instance
-    //     .collection('admission')
-    //     .document(record.reference.documentID)
-    //     .setData({
-    //   'courses': clone,
-    // });
-    //  Navigator.pop(context);
-  }
 }
 
 // date picker ====================================================================
@@ -690,6 +959,7 @@ class DateTimePicker extends StatelessWidget {
   final String labelText;
   final DateTime selectedDate;
   final ValueChanged<DateTime> selectDate;
+
   Future<void> _selectDate(BuildContext context) async {
     final DateTime picked = await showDatePicker(
       context: context,
@@ -738,6 +1008,7 @@ class InputDropdown extends StatelessWidget {
   final TextStyle valueStyle;
   final VoidCallback onPressed;
   final Widget child;
+
   @override
   Widget build(BuildContext context) {
     return InkWell(
@@ -772,6 +1043,7 @@ class PNetworkImage extends StatelessWidget {
   final String image;
   final BoxFit fit;
   final double width, height;
+
   const PNetworkImage(this.image, {Key key, this.fit, this.height, this.width})
       : super(key: key);
 

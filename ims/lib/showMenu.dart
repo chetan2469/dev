@@ -1,19 +1,19 @@
-import 'package:ims/auth.dart';
 import 'package:ims/course_module/courseList.dart';
 import 'package:ims/enquiryForm.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:ims/firebaseArrayCRUD/listArrayItems.dart';
-import 'package:ims/receiptMenu.dart/receipt.dart';
 import 'package:ims/student_module/addmission.dart';
 import 'package:ims/student_module/studentListView.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'constants/constants.dart';
 import 'package:flutter/cupertino.dart';
 
 class ShowMenu extends StatefulWidget {
   final Function _handleSignOut;
+
   ShowMenu(this._handleSignOut);
+
   @override
   _ShowMenu createState() => _ShowMenu();
 }
@@ -28,9 +28,12 @@ class _ShowMenu extends State<ShowMenu> {
       "https://docs.google.com/forms/d/e/1FAIpQLSez0X0Ja72aPveJVYzUiVWAb6YGwAhMJ8LrfXu_9Q3U-dhxhw/viewform";
   String enqUrl =
       "https://docs.google.com/spreadsheets/d/1Nhc9AAdfBI0cMqBOJ367w_L6_hsH0OCBvfXMSjrzJcE/edit#gid=79772504";
+
   @override
   void initState() {
     super.initState();
+
+    getMode();
 
     cFirebaseAuth.currentUser().then(
           (user) => setState(() {
@@ -41,6 +44,7 @@ class _ShowMenu extends State<ShowMenu> {
   }
 
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -111,11 +115,11 @@ class _ShowMenu extends State<ShowMenu> {
                     child: InkWell(
                       onTap: () {
                         setState(() {
-                          Navigator.push(
-                              context,
-                              CupertinoPageRoute(
-                                  builder: (context) =>
-                                      WebViewContainer(enqFormUrl)));
+                          // Navigator.push(
+                          //     context,
+                          //     CupertinoPageRoute(
+                          //         builder: (context) =>
+                          //             WebViewContainer(enqFormUrl)));
                         });
                       },
                       child: Container(
@@ -181,7 +185,6 @@ class _ShowMenu extends State<ShowMenu> {
                             color: Color.fromARGB(151, 255, 66, 66),
                             borderRadius:
                                 BorderRadius.all(Radius.circular(25))),
-                        //color: Color.fromARGB(151, 255, 66, 66),
                         child: Center(
                           child: Text(
                             "COURSES",
@@ -308,6 +311,7 @@ class _ShowMenu extends State<ShowMenu> {
                     setState(() {
                       mode = !mode;
                     });
+                    setMode(mode);
                   },
                 ),
               ),
@@ -387,8 +391,8 @@ class _ShowMenu extends State<ShowMenu> {
                   borderRadius: BorderRadius.circular(12)),
               child: ListTile(
                 onTap: () {
-                  Navigator.push(context,
-                      CupertinoPageRoute(builder: (context) => Receipt()));
+                  // Navigator.push(context,
+                  //     CupertinoPageRoute(builder: (context) => Receipt()));
                 },
                 leading: Icon(
                   Icons.book,
@@ -467,5 +471,24 @@ class _ShowMenu extends State<ShowMenu> {
     } else {
       throw 'Could not launch $url';
     }
+  }
+
+  setMode(bool b) async {
+    setState(() {
+      this.mode = b;
+      Constants.mode = b;
+    });
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    pref.setBool("chedo_ims_darkmode_on", b);
+  }
+
+  getMode() async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    mode = pref.getBool("chedo_ims_darkmode_on");
+
+    setState(() {
+      this.mode = mode;
+      Constants.mode = mode;
+    });
   }
 }

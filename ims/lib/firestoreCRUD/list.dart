@@ -42,7 +42,10 @@ class _ListPage extends State<ListPage> {
 
   Widget _buildBody(BuildContext context) {
     return StreamBuilder<QuerySnapshot>(
-      stream: Firestore.instance.collection('bandnames').orderBy('votes',descending: true).snapshots(),
+      stream: Firestore.instance
+          .collection('bandnames')
+          .orderBy('votes', descending: true)
+          .snapshots(),
       builder: (context, snapshot) {
         if (!snapshot.hasData) return LinearProgressIndicator();
 
@@ -78,18 +81,17 @@ class _ListPage extends State<ListPage> {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) =>
-                          UpdateContestant(data)));
+                      builder: (context) => UpdateContestant(data)));
             },
             child: Icon(Icons.edit),
           ),
           onTap: () => Firestore.instance.runTransaction((transaction) async {
-                final freshSnapshot = await transaction.get(record.reference);
-                final fresh = Record.fromSnapshot(freshSnapshot);
+            final freshSnapshot = await transaction.get(record.reference);
+            final fresh = Record.fromSnapshot(freshSnapshot);
 
-                await transaction
-                    .update(record.reference, {'votes': fresh.votes + 1});
-              }),
+            await transaction
+                .update(record.reference, {'votes': fresh.votes + 1});
+          }),
         ),
       ),
     );

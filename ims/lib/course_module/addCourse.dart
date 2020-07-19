@@ -150,43 +150,38 @@ class _AddCourse extends State<AddCourse> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Constants.mode ? Colors.black : Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.greenAccent.withGreen(100),
+        backgroundColor:
+            Constants.mode ? Colors.black : Color.fromARGB(171, 255, 66, 66),
         title: Text(
           "Add Course",
-          style: TextStyle(fontSize: 25, color: Colors.white),
+          style: TextStyle(fontSize: 20, color: Colors.white),
         ),
-        actions: <Widget>[
-          Container(
-              margin: EdgeInsets.all(10),
-              child: processing
-                  ? CircularProgressIndicator(
-                      backgroundColor: Colors.white,
-                    )
-                  : FlatButton(
-                      color: Colors.white10,
-                      child: Text(
-                        'save',
-                        style: TextStyle(color: Colors.white, fontSize: 18),
-                      ),
-                      onPressed: () {
-                        if (nameController.text.length != 0 &&
-                            feesController.text.length != 0 &&
-                            durationController.text.length != 0 &&
-                            teacherController.text.length != 0 &&
-                            syllabusController.text.length != 0) {
-                          setState(() {
-                            processing = true;
-                          });
-                          _uploadFile();
-                        }
-                      },
-                    ))
-        ],
         centerTitle: true,
         iconTheme: IconThemeData(color: Colors.black),
       ),
-      backgroundColor: Colors.grey[200],
+      floatingActionButton: FloatingActionButton(
+        child: processing
+            ? CircularProgressIndicator(
+                backgroundColor: Colors.white,
+              )
+            : Icon(
+                Icons.add,
+              ),
+        onPressed: () {
+          if (nameController.text.length != 0 &&
+              feesController.text.length != 0 &&
+              durationController.text.length != 0 &&
+              teacherController.text.length != 0 &&
+              syllabusController.text.length != 0) {
+            setState(() {
+              processing = true;
+            });
+            _uploadFile();
+          }
+        },
+      ),
       body: Container(
         margin: EdgeInsets.all(20),
         child: Center(
@@ -241,11 +236,17 @@ class _AddCourse extends State<AddCourse> {
                   }
                 },
                 decoration: InputDecoration(
+                  filled: true,
+                  fillColor: Constants.mode ? Colors.white24 : Colors.white70,
+                  labelStyle: TextStyle(
+                    color: Constants.mode ? Colors.white54 : Colors.black54,
+                  ),
                   errorText: !nameValidator
                       ? "Name Should be greater than 3 characters"
                       : null,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(25),
+                    borderSide: BorderSide(color: Colors.grey),
                   ),
                   labelText: "Name",
                 ),
@@ -272,6 +273,14 @@ class _AddCourse extends State<AddCourse> {
                           }
                         },
                         decoration: InputDecoration(
+                          filled: true,
+                          fillColor:
+                              Constants.mode ? Colors.white24 : Colors.white70,
+                          labelStyle: TextStyle(
+                            color: Constants.mode
+                                ? Colors.white54
+                                : Colors.black54,
+                          ),
                           errorText: !feesValidator
                               ? "Please Insert Fees of Course"
                               : null,
@@ -301,6 +310,14 @@ class _AddCourse extends State<AddCourse> {
                           }
                         },
                         decoration: InputDecoration(
+                          filled: true,
+                          fillColor:
+                              Constants.mode ? Colors.white24 : Colors.white70,
+                          labelStyle: TextStyle(
+                            color: Constants.mode
+                                ? Colors.white54
+                                : Colors.black54,
+                          ),
                           errorText: !durationValidator
                               ? "Please Insert Duration of Course"
                               : null,
@@ -331,6 +348,11 @@ class _AddCourse extends State<AddCourse> {
                   }
                 },
                 decoration: InputDecoration(
+                  filled: true,
+                  fillColor: Constants.mode ? Colors.white24 : Colors.white70,
+                  labelStyle: TextStyle(
+                    color: Constants.mode ? Colors.white54 : Colors.black54,
+                  ),
                   errorText: !teacherNameValidator
                       ? "Insert Teacher name for Course"
                       : null,
@@ -358,6 +380,11 @@ class _AddCourse extends State<AddCourse> {
                   }
                 },
                 decoration: InputDecoration(
+                  filled: true,
+                  fillColor: Constants.mode ? Colors.white24 : Colors.white70,
+                  labelStyle: TextStyle(
+                    color: Constants.mode ? Colors.white54 : Colors.black54,
+                  ),
                   errorText: !syllabusValidator
                       ? "Insert Teacher name for Course"
                       : null,

@@ -88,7 +88,7 @@ class _PhoneAuthState extends State<PhoneAuth> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-              child: Column(
+        child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             Container(
@@ -101,7 +101,7 @@ class _PhoneAuthState extends State<PhoneAuth> {
                 print('________');
               },
               child: Container(
-                child: Text(mob==null?'Mob num':mob),
+                child: Text(mob == null ? 'Mob num' : mob),
               ),
             ),
             Container(

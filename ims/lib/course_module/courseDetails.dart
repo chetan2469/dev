@@ -1,26 +1,22 @@
 import 'dart:io';
-import 'package:flutter_image_compress/flutter_image_compress.dart';
-import 'dart:math' as Math;
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
+import 'package:ims/constants/constants.dart';
 import 'package:ims/data/course_record.dart';
-import 'package:ims/data/record.dart';
 import 'package:ims/viewImage.dart';
-import 'package:intl/intl.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
 class CourseDetails extends StatefulWidget {
   final CourseRecord record;
 
   CourseDetails(this.record);
+
   @override
   _CourseDetails createState() => _CourseDetails(record);
 }
 
 class _CourseDetails extends State<CourseDetails> {
   final CourseRecord record;
+
   _CourseDetails(this.record);
 
   bool processing = false, status;
@@ -32,10 +28,14 @@ class _CourseDetails extends State<CourseDetails> {
   String photourl;
   bool flag = true;
 
+  TextStyle textMode = TextStyle(
+    color: Constants.mode ? Colors.white : Colors.black,
+  );
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey.shade300,
+      backgroundColor: Constants.mode ? Colors.black87 : Colors.white,
       body: SingleChildScrollView(
         child: Stack(
           children: <Widget>[
@@ -62,7 +62,8 @@ class _CourseDetails extends State<CourseDetails> {
                         padding: EdgeInsets.all(16.0),
                         margin: EdgeInsets.only(top: 16.0),
                         decoration: BoxDecoration(
-                            color: Colors.white,
+                            color:
+                                Constants.mode ? Colors.black87 : Colors.white,
                             borderRadius: BorderRadius.circular(5.0)),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -74,7 +75,12 @@ class _CourseDetails extends State<CourseDetails> {
                                 children: <Widget>[
                                   Text(
                                     record.name,
-                                    style: Theme.of(context).textTheme.title,
+                                    style: TextStyle(
+                                      fontSize: 21,
+                                      color: Constants.mode
+                                          ? Colors.white
+                                          : Colors.black,
+                                    ),
                                   ),
                                 ],
                               ),
@@ -93,7 +99,10 @@ class _CourseDetails extends State<CourseDetails> {
                                                     .withOpacity(0.5)))),
                                     child: Column(
                                       children: <Widget>[
-                                        Text("Since"),
+                                        Text(
+                                          "Since",
+                                          style: textMode,
+                                        ),
                                         Chip(
                                           elevation: 12,
                                           label: Text(
@@ -123,12 +132,15 @@ class _CourseDetails extends State<CourseDetails> {
                                 Expanded(
                                   child: Column(
                                     children: <Widget>[
-                                      Text("Duration"),
+                                      Text(
+                                        "Duration",
+                                        style: textMode,
+                                      ),
                                       Chip(
                                         elevation: 12,
                                         label: Text(
                                           record.duration + ' hours',
-                                          style: TextStyle(color: Colors.white),
+                                          style: textMode,
                                         ),
                                         backgroundColor: Colors.orange,
                                       ),
@@ -146,7 +158,10 @@ class _CourseDetails extends State<CourseDetails> {
                                                     .withOpacity(0.5)))),
                                     child: Column(
                                       children: <Widget>[
-                                        Text("Fees"),
+                                        Text(
+                                          "Fees",
+                                          style: textMode,
+                                        ),
                                         Chip(
                                           elevation: 12,
                                           label: Text(
@@ -181,33 +196,60 @@ class _CourseDetails extends State<CourseDetails> {
                   SizedBox(height: 20.0),
                   Container(
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: Constants.mode ? Colors.transparent : Colors.white,
                       borderRadius: BorderRadius.circular(5.0),
                     ),
                     child: Column(
                       children: <Widget>[
                         ListTile(
-                          title: Text("Course Information"),
+                          title: Text(
+                            "Course Information",
+                            style: textMode,
+                          ),
                         ),
                         Divider(),
                         ListTile(
-                          title: Text("Added by"),
-                          subtitle: Text(record.addedBy),
+                          title: Text(
+                            "Added by",
+                            style: textMode,
+                          ),
+                          subtitle: Text(
+                            record.addedBy,
+                            style: textMode,
+                          ),
                           leading: Icon(Icons.account_box),
                         ),
                         ListTile(
-                          title: Text("Teacher"),
-                          subtitle: Text(record.teacher),
+                          title: Text(
+                            "Teacher",
+                            style: textMode,
+                          ),
+                          subtitle: Text(
+                            record.teacher,
+                            style: textMode,
+                          ),
                           leading: Icon(Icons.person),
                         ),
                         ListTile(
-                          title: Text("Syllabus"),
-                          subtitle: Text(record.syllabus),
+                          title: Text(
+                            "Syllabus",
+                            style: textMode,
+                          ),
+                          subtitle: Text(
+                            record.syllabus,
+                            style: textMode,
+                          ),
                           leading: Icon(Icons.book),
                         ),
                         ListTile(
-                          title: Text("note"),
-                          subtitle: Text(record.note),
+                          title: Text(
+                            "note",
+                            style: textMode,
+                          ),
+                          subtitle: Text(
+                            record.note,
+                            style: textMode,
+                          ),
                           leading: Icon(Icons.note),
                         ),
                       ],
@@ -242,6 +284,7 @@ class InputDropdown extends StatelessWidget {
   final TextStyle valueStyle;
   final VoidCallback onPressed;
   final Widget child;
+
   @override
   Widget build(BuildContext context) {
     return InkWell(
@@ -276,12 +319,14 @@ class PNetworkImage extends StatelessWidget {
   final String image;
   final BoxFit fit;
   final double width, height;
+
   const PNetworkImage(this.image, {Key key, this.fit, this.height, this.width})
       : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return CachedNetworkImage(
+      filterQuality: FilterQuality.high,
       colorBlendMode: BlendMode.colorDodge,
       imageUrl: image,
       placeholder: (context, url) => Center(child: CircularProgressIndicator()),

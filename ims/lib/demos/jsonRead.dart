@@ -92,16 +92,17 @@ class PhotosList extends StatelessWidget {
               margin: EdgeInsets.all(10),
               padding: EdgeInsets.all(20),
               decoration: BoxDecoration(
-                border: Border.all(),
-                borderRadius: BorderRadius.circular(10)
-              ),
+                  border: Border.all(),
+                  borderRadius: BorderRadius.circular(10)),
               child: ListTile(
-                leading: CircleAvatar(backgroundImage: NetworkImage(photos[index].thumbnailUrl),),
+                leading: CircleAvatar(
+                  backgroundImage: NetworkImage(photos[index].thumbnailUrl),
+                ),
                 title: Text(
-                photos[index].title,
-                style: TextStyle(fontSize: 18),
-              ),
-              trailing: Text(photos[index].id.toString()),
+                  photos[index].title,
+                  style: TextStyle(fontSize: 18),
+                ),
+                trailing: Text(photos[index].id.toString()),
               ));
         });
   }

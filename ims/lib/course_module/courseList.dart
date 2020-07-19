@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:ims/constants/constants.dart';
 import 'package:ims/course_module/addCourse.dart';
 import 'package:ims/course_module/courseDetails.dart';
 import 'package:ims/data/course_record.dart';
@@ -30,33 +31,31 @@ class _CourseListViewState extends State<CourseListView> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     fetchCourseData();
+    print(Constants.mode);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Constants.mode ? Colors.black87 : Colors.white,
+      floatingActionButton: FloatingActionButton(
+          child: Icon(
+            Icons.add,
+            color: Constants.mode ? Colors.black : Colors.white,
+          ),
+          backgroundColor:
+              Constants.mode ? Colors.white : Color.fromARGB(151, 255, 66, 66),
+          onPressed: () {
+            Navigator.push(
+                context, MaterialPageRoute(builder: (context) => AddCourse()));
+          }),
       appBar: AppBar(
-        backgroundColor: Color.fromARGB(192, 106, 99, 245),
+        backgroundColor:
+            Constants.mode ? Colors.black : Color.fromARGB(151, 255, 66, 66),
         centerTitle: true,
         title: Text('Course List'),
-        actions: <Widget>[
-          Container(
-            margin: EdgeInsets.all(10),
-            child: FlatButton.icon(
-              icon: Icon(Icons.add,color: Colors.white,),
-              onPressed: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context)=>AddCourse()));
-              },
-              label: Text(
-                'Course',
-                style: TextStyle(color: Colors.white),
-              ),
-            ),
-          )
-        ],
       ),
       body: Center(
         child: processing
@@ -105,40 +104,59 @@ class _CourseListViewState extends State<CourseListView> {
                         },
                         child: Container(
                           margin: EdgeInsets.only(
-                              top: 10, bottom: 5, left: 10, right: 10),
+                              top: 10, bottom: 3, left: 10, right: 10),
                           //color: Colors.grey[200],
                           decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(20),
-                              border:
-                                  Border.all(width: 3, color: Colors.black12),
-                              color: Colors.white.withOpacity(0.2)),
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(
+                                width: 3,
+                                color: Constants.mode
+                                    ? Colors.white12
+                                    : Colors.black12),
+                            color: Constants.mode
+                                ? Colors.transparent
+                                : Colors.white.withOpacity(0.2),
+                          ),
                           child: Container(
-                            height: 100,
                             padding:
-                                EdgeInsets.only(left: 2, top: 20, bottom: 20),
+                                EdgeInsets.only(left: 2, top: 10, bottom: 10),
                             child: ListTile(
-                              leading: Image(
-                                fit: BoxFit.fill,
-                                image: new CachedNetworkImageProvider(
-                                    filteredcourseList[i].imageUrl),
-                              ),
+                              leading: CircleAvatar(
+                                  backgroundImage: NetworkImage(
+                                      filteredcourseList[i].imageUrl)),
                               title: Text(
                                 filteredcourseList[i].name,
-                                style: TextStyle(fontSize: 20),
+                                style: TextStyle(
+                                    fontSize: 18,
+                                    color: Constants.mode
+                                        ? Colors.white70
+                                        : Colors.black87),
                               ),
                               trailing: Chip(
-                                avatar: Icon(Icons.timer),
+                                avatar: Icon(
+                                  Icons.timer,
+                                  color: Constants.mode
+                                      ? Colors.white
+                                      : Colors.black,
+                                ),
                                 elevation: 12,
-                                backgroundColor: Colors.green.withOpacity(0.7),
+                                backgroundColor: Constants.mode
+                                    ? Colors.black87
+                                    : Colors.green.withOpacity(.7),
                                 label: Text(
-                                    filteredcourseList[i].duration + " hours"),
+                                  filteredcourseList[i].duration + " hours",
+                                  style: TextStyle(
+                                    color: Constants.mode
+                                        ? Colors.white
+                                        : Colors.black,
+                                  ),
+                                ),
                               ),
                             ),
                           ),
                         ),
                       ),
                     );
-                    ;
                   },
                 ),
               ),

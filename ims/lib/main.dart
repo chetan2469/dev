@@ -1,27 +1,114 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:ims/auth.dart';
-import 'package:ims/demos/animatedSwitcher.dart';
-import 'package:ims/demos/clippingtool.dart';
+import 'package:ims/ui_widgets/tubeWater.dart';
 
-main() => runApp(MyApp());
+void main() => runApp(MyApp());
 
-class MyApp extends StatefulWidget {
-  @override
-  _MyAppState createState() => _MyAppState();
-}
-
-class _MyAppState extends State<MyApp> {
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-  }
-
+class MyApp extends StatelessWidget {
+  double percent = 43;
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: AnimatedSwitcherDemo(),
+      home: Scaffold(
+        body: Center(
+            child: ListView(
+          children: <Widget>[
+            Row(
+              children: <Widget>[
+                Expanded(
+                    child: Container(
+                        margin: EdgeInsets.all(10),
+                        child: TubeWater(
+                          percent: 78,
+                          liquidColor: Colors.green,
+                          label: "Progress",
+                          tubeBorderColor: Colors.green,
+                          liquidUpperLayerColor: Colors.green[50],
+                        ))),
+                Expanded(
+                    child: Container(
+                        margin: EdgeInsets.all(10),
+                        child: TubeWater(
+                          percent: 45,
+                          liquidColor: Colors.black,
+                          label: "Lavel",
+                          tubeFontColor: Colors.white,
+                          liquidUpperLayerColor: Colors.grey,
+                        )))
+              ],
+            )
+          ],
+        )),
+      ),
     );
   }
 }
+
+// import 'package:firebase_messaging/firebase_messaging.dart';
+// import 'package:flutter/material.dart';
+// import 'package:ims/auth.dart';
+
+// void main() => runApp(MyApp());
+
+// class MyApp extends StatelessWidget {
+//   @override
+//   Widget build(BuildContext context) {
+//     return MaterialApp(
+//       title: 'Flutter Demo',
+//       theme: ThemeData(
+//         primarySwatch: Colors.blue,
+//       ),
+//       home: MyHomePage(title: 'Flutter Demo Home Page'),
+//     );
+//   }
+// }
+
+// class MyHomePage extends StatefulWidget {
+//   MyHomePage({Key key, this.title}) : super(key: key);
+//   final String title;
+
+//   @override
+//   _MyHomePageState createState() => _MyHomePageState();
+// }
+
+// class _MyHomePageState extends State<MyHomePage> {
+//   int _counter = 0;
+
+//   String title = "Title";
+//   String helper = "helper";
+
+//   FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
+
+//   @override
+//   void initState() {
+//     // TODO: implement initState
+//     super.initState();
+
+//     _firebaseMessaging.configure(
+//       onMessage: (message) async {
+//         setState(() {
+//           title = message["notification"]["title"];
+//           helper = "You have recieved a new notification";
+//         });
+//       },
+//       onResume: (message) async {
+//         setState(() {
+//           title = message["data"]["title"];
+//           helper = "You have open the application from notification";
+//         });
+//       },
+//     );
+//   }
+
+//   void _incrementCounter() {
+//     setState(() {
+//       _counter++;
+//     });
+//   }
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return SignInG();
+//   }
+// }

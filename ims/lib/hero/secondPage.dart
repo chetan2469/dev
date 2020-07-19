@@ -11,11 +11,10 @@ class _SecondPageState extends State<SecondPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: InkWell(
-        onTap: ()
-        {
+        onTap: () {
           Navigator.pop(context);
         },
-              child: Container(
+        child: Container(
           child: Hero(
             tag: "animDemo",
             child: Icon(

@@ -4,7 +4,9 @@ import 'package:cached_network_image/cached_network_image.dart';
 
 class ViewImage extends StatefulWidget {
   final String url;
+
   ViewImage(this.url);
+
   @override
   _ViewImageState createState() => _ViewImageState();
 }
@@ -15,9 +17,8 @@ class _ViewImageState extends State<ViewImage> {
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         child: Text('back'),
-        onPressed: (){
+        onPressed: () {
           Navigator.pop(context);
-          
         },
       ),
       body: Center(

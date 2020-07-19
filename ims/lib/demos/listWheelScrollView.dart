@@ -80,7 +80,6 @@ class _ListWheelState extends State<ListWheel> {
     ),
   ];
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -93,20 +92,20 @@ class _ListWheelState extends State<ListWheel> {
       diameterRatio: 3.5,
       physics: FixedExtentScrollPhysics(),
       children: friends.map((frd) {
-    return Card(
-        child: Row(
-      children: <Widget>[
-        Expanded(
-            child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Text(
-            frd,
-            style: TextStyle(fontSize: 18.0),
-          ),
-        )),
-      ],
-    ));
-  }).toList(),
+        return Card(
+            child: Row(
+          children: <Widget>[
+            Expanded(
+                child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(
+                frd,
+                style: TextStyle(fontSize: 18.0),
+              ),
+            )),
+          ],
+        ));
+      }).toList(),
     ));
   }
 }

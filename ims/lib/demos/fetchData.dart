@@ -29,7 +29,7 @@ class _FetchDataState extends State<FetchData> {
     }
 
     List jsonList = Fact.encondeToJson(list);
-      print("numFact: ${jsonList}");
+    print("numFact: ${jsonList}");
   }
 
   @override

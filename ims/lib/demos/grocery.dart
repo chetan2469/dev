@@ -1,9 +1,15 @@
 class Items {
-  final String englishName,marathiName,hindiName;
+  final String englishName, marathiName, hindiName;
   final int quantity;
-  final double unit,price;
+  final double unit, price;
 
-  Items({this.englishName, this.marathiName, this.hindiName, this.quantity, this.unit, this.price});
+  Items(
+      {this.englishName,
+      this.marathiName,
+      this.hindiName,
+      this.quantity,
+      this.unit,
+      this.price});
 
   factory Items.fromJson(Map<String, dynamic> json) {
     return Items(

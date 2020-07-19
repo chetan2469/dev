@@ -6,8 +6,11 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:ims/auth.dart';
+import 'package:ims/constants/constants.dart';
+import 'package:ims/courseModule/addCourseEntry.dart';
 import 'package:ims/data/course_record.dart';
 import 'package:ims/data/record.dart';
+import 'package:ims/data/studentCourseEntry.dart';
 import 'package:ims/showMenu.dart';
 import 'package:ims/viewImage.dart';
 import 'package:intl/intl.dart';
@@ -28,6 +31,9 @@ class _AddStudInfo extends State<AddStudInfo> {
   TextEditingController courseController = TextEditingController();
   TextEditingController batchController = TextEditingController();
   TextEditingController addCourseController = TextEditingController();
+  TextEditingController outStandingAmountController = TextEditingController();
+
+  int outStandingAmount = 0;
 
   bool validator1 = true,
       validator2 = true,
@@ -38,15 +44,31 @@ class _AddStudInfo extends State<AddStudInfo> {
       validator7 = true,
       togg = false;
   bool processing = false, status = true, editing = false;
-  DateTime dob, addDate;
+  DateTime dob, addDate = DateTime.now();
   String thumbnail;
   File _imageFile;
   String photourl =
           'https://ringwooddental.com.au/wp-content/uploads/2018/05/profile-placeholder-f-e1526434202694.jpg',
       downurl;
   bool flag = true;
-  List courses = List();
-  List<String> courseList = List();
+  List selectedCoursesReferences =
+      List(); // for sending student course_entry array
+  List<StudentCourseEntry> selectedCourses = List();
+  List<String> courseListForDropDown = List();
+
+  TextStyle colorMode =
+      TextStyle(color: Constants.mode ? Colors.white60 : Colors.grey);
+
+  String getCourseNamebyId(String id) {
+    Firestore.instance
+        .collection('student_course')
+        .document(id)
+        .get()
+        .then((DocumentSnapshot ds) {
+      String course_name = ds['course_name'];
+      return course_name;
+    });
+  }
 
   Future<Null> _pickImageFromGallery() async {
     print("___________________________________________");
@@ -81,6 +103,56 @@ class _AddStudInfo extends State<AddStudInfo> {
         "________________COMPRESS FILE______________");
 
     return result;
+  }
+
+  updateCourseList(StudentCourseEntry studentCourseEntry) {
+    //selectedCoursesReferences.add(studentCourseEntry.reference.documentID);
+
+    selectedCourses.add(studentCourseEntry);
+
+    print("selectedCoursesReferences Courses    :   " +
+        selectedCoursesReferences.toString());
+    print("selectedCourses     :   " + selectedCourses.toString());
+
+    updateOutStandingAmount();
+  }
+
+  updateOutStandingAmount() {
+    setState(() {
+      outStandingAmount = 0;
+    });
+
+    for (var course in selectedCourses) {
+      outStandingAmount =
+          outStandingAmount + int.parse(course.course_total_fees);
+    }
+  }
+
+  Future<void> _fillInfoDialogue() async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Fill All information First'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text('You have to fill all information before upload an image'),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            FlatButton(
+              child: Text('ok i will'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   _showDialog(BuildContext context) async {
@@ -181,7 +253,8 @@ class _AddStudInfo extends State<AddStudInfo> {
       'dateOfBirth': dob,
       'addDate': addDate,
       'status': status,
-      'courses': courses,
+      'courses': selectedCoursesReferences,
+      'outStandingAmount': outStandingAmount,
     });
 
     setState(() {
@@ -191,91 +264,20 @@ class _AddStudInfo extends State<AddStudInfo> {
     Navigator.pop(context);
   }
 
-  fetchCourseData() async {
-    setState(() {
-      processing = true;
-      courseList.clear();
-    });
-    final QuerySnapshot result =
-        await Firestore.instance.collection('courses').getDocuments();
-
-    final List<DocumentSnapshot> documents = result.documents;
-    documents.forEach((data) {
-      final record = CourseRecord.fromSnapshot(data);
-      courseList.add(record.name);
-    });
-
-    setState(() {
-      processing = false;
-    });
-
-    courseList.sort((a, b) {
-      return a.toLowerCase().compareTo(b.toLowerCase());
-    });
-
-    print(courseList);
-  }
-
   @override
   void initState() {
     super.initState();
-    fetchCourseData();
 
-    print(courses);
-  }
-
-  _addCourseDialogue() async {
-    String scourse = null;
-    await showDialog<String>(
-      context: context,
-      child: AlertDialog(
-        contentPadding: const EdgeInsets.all(16.0),
-        content: DropdownButton<String>(
-          hint: scourse == null ? Text('choose course') : Text(scourse),
-          value: scourse,
-          icon: Icon(Icons.arrow_drop_down),
-          iconSize: 24,
-          elevation: 16,
-          onChanged: (String str) {
-            setState(() {
-              scourse = str;
-              addCourseController.text = str;
-              print(scourse);
-            });
-          },
-          items: courseList.map<DropdownMenuItem<String>>((String value) {
-            return DropdownMenuItem<String>(
-              value: value,
-              child: Text(value),
-            );
-          }).toList(),
-        ),
-        actions: <Widget>[
-          FlatButton(
-              child: const Text('cancle'),
-              onPressed: () {
-                Navigator.pop(context);
-              }),
-          FlatButton(
-              child: const Text('save'),
-              onPressed: () {
-                print('________You Entered___________' + courseController.text);
-                if (addCourseController.text.length > 0) {
-                  setState(() {
-                    courses.add(addCourseController.text);
-                    Navigator.pop(context);
-                  });
-                }
-              })
-        ],
-      ),
-    );
+    setState(() {
+      outStandingAmount = 0;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey.shade300,
+      backgroundColor:
+          Constants.mode ? Colors.transparent : Colors.grey.shade300,
       body: SingleChildScrollView(
         child: Stack(
           children: <Widget>[
@@ -302,8 +304,11 @@ class _AddStudInfo extends State<AddStudInfo> {
                         padding: EdgeInsets.all(16.0),
                         margin: EdgeInsets.only(top: 16.0),
                         decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(5.0)),
+                            color:
+                                Constants.mode ? Colors.black87 : Colors.white,
+                            borderRadius: BorderRadius.circular(5.0),
+                            border:
+                                Border.all(color: Colors.white, width: 0.1)),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
@@ -315,8 +320,26 @@ class _AddStudInfo extends State<AddStudInfo> {
                                   Container(
                                     child: TextField(
                                       controller: namefieldController,
-                                      decoration:
-                                          InputDecoration(hintText: 'name'),
+                                      textCapitalization:
+                                          TextCapitalization.words,
+                                      style: new TextStyle(
+                                          color: Constants.mode
+                                              ? Colors.white
+                                              : Colors.black),
+                                      decoration: InputDecoration(
+                                        enabledBorder: OutlineInputBorder(
+                                          borderSide: BorderSide(
+                                              color: Colors.white70,
+                                              width: 1.0),
+                                        ),
+                                        labelText: 'Name',
+                                        filled: true,
+                                        labelStyle: TextStyle(
+                                          color: Constants.mode
+                                              ? Colors.white
+                                              : Colors.black,
+                                        ),
+                                      ),
                                     ),
                                   ),
                                   ListTile(
@@ -325,10 +348,10 @@ class _AddStudInfo extends State<AddStudInfo> {
                                       height:
                                           MediaQuery.of(context).size.height *
                                               0.07,
-                                      child: courses != null
+                                      child: selectedCourses != null
                                           ? ListView.builder(
                                               scrollDirection: Axis.horizontal,
-                                              itemCount: courses.length,
+                                              itemCount: selectedCourses.length,
                                               itemBuilder: (context, index) {
                                                 return Container(
                                                     margin: EdgeInsets.all(2),
@@ -338,7 +361,8 @@ class _AddStudInfo extends State<AddStudInfo> {
                                                       backgroundColor:
                                                           Colors.redAccent,
                                                       label: Text(
-                                                          courses[index]
+                                                          selectedCourses[index]
+                                                              .course_name
                                                               .toString(),
                                                           style: TextStyle(
                                                               color:
@@ -346,11 +370,29 @@ class _AddStudInfo extends State<AddStudInfo> {
                                                               fontSize: 16.0)),
                                                       onDeleted: () {
                                                         setState(() {
-                                                          print(courses[index] +
+                                                          print(selectedCourses[
+                                                                      index]
+                                                                  .course_name +
                                                               " removed !!");
-                                                          courses
+                                                          Firestore.instance
+                                                              .collection(
+                                                                  'student_course')
+                                                              .document(
+                                                                  selectedCourses[
+                                                                          index]
+                                                                      .reference
+                                                                      .documentID)
+                                                              .delete()
+                                                              .catchError(
+                                                                  (onError) {
+                                                            print(onError);
+                                                          }); //delete from firestore
+                                                          selectedCourses
+                                                              .removeAt(index);
+                                                          selectedCoursesReferences
                                                               .removeAt(index);
                                                         });
+                                                        updateOutStandingAmount();
                                                       },
                                                     ));
                                               })
@@ -387,14 +429,19 @@ class _AddStudInfo extends State<AddStudInfo> {
                                           children: <Widget>[
                                             dob != null
                                                 ? Container(
-                                                    child: Text(dob.day
-                                                            .toString() +
-                                                        ' / ' +
-                                                        dob.month.toString() +
-                                                        ' / ' +
-                                                        dob.year.toString()),
+                                                    child: Text(
+                                                      dob.day.toString() +
+                                                          ' / ' +
+                                                          dob.month.toString() +
+                                                          ' / ' +
+                                                          dob.year.toString(),
+                                                      style: colorMode,
+                                                    ),
                                                   )
-                                                : Text("DOB")
+                                                : Text(
+                                                    "DOB",
+                                                    style: colorMode,
+                                                  )
                                           ],
                                         ),
                                       ),
@@ -406,7 +453,13 @@ class _AddStudInfo extends State<AddStudInfo> {
                                         InkWell(
                                           onTap: () {
                                             print('hello');
-                                            _addCourseDialogue();
+                                            Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        AddCourseEntry(
+                                                            updateCourseList,
+                                                            DateTime.now())));
                                           },
                                           child: Chip(
                                             label: Text(
@@ -442,12 +495,19 @@ class _AddStudInfo extends State<AddStudInfo> {
                                         child: Column(
                                           children: <Widget>[
                                             addDate != null
-                                                ? Text(addDate.day.toString() +
-                                                    ' / ' +
-                                                    addDate.month.toString() +
-                                                    ' / ' +
-                                                    addDate.year.toString())
-                                                : Text("Joined")
+                                                ? Text(
+                                                    addDate.day.toString() +
+                                                        ' / ' +
+                                                        addDate.month
+                                                            .toString() +
+                                                        ' / ' +
+                                                        addDate.year.toString(),
+                                                    style: colorMode,
+                                                  )
+                                                : Text(
+                                                    "Joined",
+                                                    style: colorMode,
+                                                  )
                                           ],
                                         ),
                                       ),
@@ -462,7 +522,12 @@ class _AddStudInfo extends State<AddStudInfo> {
                       InkWell(
                         onTap: () {
                           setState(() {
-                            _showDialog(context);
+                            if (validate()) {
+                              _showDialog(context);
+                            } else {
+                              _fillInfoDialogue();
+                              print("fill info first");
+                            }
                           });
                         },
                         child: Container(
@@ -481,66 +546,190 @@ class _AddStudInfo extends State<AddStudInfo> {
                   SizedBox(height: 20.0),
                   Container(
                     decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(5.0),
-                    ),
+                        color: Constants.mode ? Colors.black87 : Colors.white,
+                        borderRadius: BorderRadius.circular(5.0),
+                        border: Border.all(color: Colors.white, width: 0.1)),
                     child: Column(
                       children: <Widget>[
                         ListTile(
-                          title: Text("Student Information"),
+                          title: Text(
+                            "Student Information",
+                            style: colorMode,
+                          ),
                         ),
                         Divider(),
                         ListTile(
                           subtitle: TextField(
                             keyboardType: TextInputType.number,
                             controller: mobileController,
+                            style: new TextStyle(
+                                color: Constants.mode
+                                    ? Colors.white
+                                    : Colors.black),
                             decoration: InputDecoration(
-                                contentPadding: EdgeInsets.all(10),
-                                hintText: 'Mobile Number'),
+                              enabledBorder: OutlineInputBorder(
+                                borderSide: BorderSide(
+                                    color: Colors.white70, width: 1.0),
+                              ),
+                              labelText: 'Mobile Number',
+                              filled: true,
+                              labelStyle: TextStyle(
+                                color: Constants.mode
+                                    ? Colors.white
+                                    : Colors.black,
+                              ),
+                            ),
                           ),
-                          leading: Icon(Icons.phone),
+                          leading: Icon(
+                            Icons.phone,
+                            color:
+                                Constants.mode ? Colors.white : Colors.black54,
+                          ),
                         ),
                         Divider(),
                         ListTile(
                           subtitle: TextField(
                             keyboardType: TextInputType.number,
                             controller: optionalNoController,
+                            style: new TextStyle(
+                                color: Constants.mode
+                                    ? Colors.white
+                                    : Colors.black),
                             decoration: InputDecoration(
-                                contentPadding: EdgeInsets.all(10),
-                                hintText: 'Optional Number'),
+                              enabledBorder: OutlineInputBorder(
+                                borderSide: BorderSide(
+                                    color: Colors.white70, width: 1.0),
+                              ),
+                              labelText: 'Optional Mobile Number',
+                              filled: true,
+                              labelStyle: TextStyle(
+                                color: Constants.mode
+                                    ? Colors.white
+                                    : Colors.black,
+                              ),
+                            ),
                           ),
-                          leading: Icon(Icons.phone),
+                          leading: Icon(
+                            Icons.phone,
+                            color:
+                                Constants.mode ? Colors.white : Colors.black54,
+                          ),
                         ),
                         Divider(),
                         ListTile(
                           subtitle: TextField(
                             controller: addressfieldController,
+                            textCapitalization: TextCapitalization.words,
+                            style: new TextStyle(
+                                color: Constants.mode
+                                    ? Colors.white
+                                    : Colors.black),
                             decoration: InputDecoration(
-                                contentPadding: EdgeInsets.all(10),
-                                hintText: 'Address'),
+                              enabledBorder: OutlineInputBorder(
+                                borderSide: BorderSide(
+                                    color: Colors.white70, width: 1.0),
+                              ),
+                              labelText: 'Address',
+                              filled: true,
+                              labelStyle: TextStyle(
+                                color: Constants.mode
+                                    ? Colors.white
+                                    : Colors.black,
+                              ),
+                            ),
                           ),
-                          leading: Icon(Icons.confirmation_number),
+                          leading: Icon(
+                            Icons.confirmation_number,
+                            color:
+                                Constants.mode ? Colors.white : Colors.black54,
+                          ),
                         ),
                         Divider(),
                         ListTile(
                           subtitle: TextField(
                             keyboardType: TextInputType.number,
                             controller: aadharfieldController,
+                            style: new TextStyle(
+                                color: Constants.mode
+                                    ? Colors.white
+                                    : Colors.black),
                             decoration: InputDecoration(
-                                contentPadding: EdgeInsets.all(10),
-                                hintText: 'Aadhar Number'),
+                              enabledBorder: OutlineInputBorder(
+                                borderSide: BorderSide(
+                                    color: Colors.white70, width: 1.0),
+                              ),
+                              labelText: 'Aadhar Number',
+                              filled: true,
+                              labelStyle: TextStyle(
+                                color: Constants.mode
+                                    ? Colors.white
+                                    : Colors.black,
+                              ),
+                            ),
                           ),
-                          leading: Icon(Icons.confirmation_number),
+                          leading: Icon(
+                            Icons.confirmation_number,
+                            color:
+                                Constants.mode ? Colors.white : Colors.black54,
+                          ),
                         ),
                         Divider(),
                         ListTile(
                           subtitle: TextField(
                             controller: batchController,
+                            textCapitalization: TextCapitalization.words,
+                            style: new TextStyle(
+                                color: Constants.mode
+                                    ? Colors.white
+                                    : Colors.black),
                             decoration: InputDecoration(
-                                contentPadding: EdgeInsets.all(10),
-                                hintText: 'Batch Time ? '),
+                              enabledBorder: OutlineInputBorder(
+                                borderSide: BorderSide(
+                                    color: Colors.white70, width: 1.0),
+                              ),
+                              labelText: 'Batch Time',
+                              filled: true,
+                              labelStyle: TextStyle(
+                                color: Constants.mode
+                                    ? Colors.white
+                                    : Colors.black,
+                              ),
+                            ),
                           ),
-                          leading: Icon(Icons.person),
+                          leading: Icon(
+                            Icons.person,
+                            color:
+                                Constants.mode ? Colors.white : Colors.black54,
+                          ),
+                        ),
+                        Divider(),
+                        ListTile(
+                          subtitle: TextField(
+                            enabled: false,
+                            controller: outStandingAmountController,
+                            style: new TextStyle(
+                                color: Constants.mode
+                                    ? Colors.white
+                                    : Colors.black),
+                            decoration: InputDecoration(
+                              enabledBorder: OutlineInputBorder(
+                                borderSide: BorderSide(
+                                    color: Colors.white70, width: 1.0),
+                              ),
+                              labelText: outStandingAmount.toString(),
+                              filled: true,
+                              labelStyle: TextStyle(
+                                color: Constants.mode
+                                    ? Colors.white
+                                    : Colors.black,
+                              ),
+                            ),
+                          ),
+                          leading: Icon(
+                            Icons.monetization_on,
+                            color:
+                                Constants.mode ? Colors.white : Colors.black54,
+                          ),
                         ),
                       ],
                     ),
@@ -556,11 +745,15 @@ class _AddStudInfo extends State<AddStudInfo> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
+        backgroundColor: Constants.mode ? Colors.white : Colors.blue,
         child: processing
             ? CircularProgressIndicator(
                 valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
               )
-            : Icon(Icons.done),
+            : Icon(
+                Icons.done,
+                color: Constants.mode ? Colors.black : Colors.white,
+              ),
         onPressed: () {
           setState(() {
             print("name : " + namefieldController.text);
@@ -569,12 +762,7 @@ class _AddStudInfo extends State<AddStudInfo> {
             print("addr : " + addressfieldController.text);
             print("aadhar : " + aadharfieldController.text);
             print("batch: " + batchController.text);
-            if (namefieldController.text.length > 6 &&
-                mobileController.text.length == 10 &&
-                optionalNoController.text.length == 10 &&
-                addressfieldController.text.length > 5 &&
-                aadharfieldController.text.length == 12 &&
-                batchController.text.length > 6) {
+            if (validate()) {
               insert();
             } else {
               print(
@@ -585,6 +773,29 @@ class _AddStudInfo extends State<AddStudInfo> {
       ),
     );
   }
+
+  bool validate() {
+    if (namefieldController.text.length > 6 &&
+        mobileController.text.length == 10 &&
+        optionalNoController.text.length == 10 &&
+        addressfieldController.text.length > 5 &&
+        aadharfieldController.text.length == 12 &&
+        batchController.text.length > 6) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+// String getCourseNamebyDocumentID(String id) {
+//   Firestore.instance
+//       .collection('student_course')
+//       .document(id)
+//       .get()
+//       .then((DocumentSnapshot document) {
+//     return document['course_name'];
+//   });
+// }
 }
 
 // date picker ====================================================================
@@ -599,6 +810,7 @@ class DateTimePicker extends StatelessWidget {
   final String labelText;
   final DateTime selectedDate;
   final ValueChanged<DateTime> selectDate;
+
   Future<void> _selectDate(BuildContext context) async {
     final DateTime picked = await showDatePicker(
       context: context,
@@ -647,6 +859,7 @@ class InputDropdown extends StatelessWidget {
   final TextStyle valueStyle;
   final VoidCallback onPressed;
   final Widget child;
+
   @override
   Widget build(BuildContext context) {
     return InkWell(
@@ -681,6 +894,7 @@ class PNetworkImage extends StatelessWidget {
   final String image;
   final BoxFit fit;
   final double width, height;
+
   const PNetworkImage(this.image, {Key key, this.fit, this.height, this.width})
       : super(key: key);
 
@@ -696,6 +910,14 @@ class PNetworkImage extends StatelessWidget {
     );
   }
 }
+
+// Firestore.instance
+//         .collection('student_course')
+//         .document(courses[index])
+//         .get()
+//         .then((DocumentSnapshot ds) {
+//       // use ds as a snapshot
+//     });
 
 // import 'dart:io';
 // import 'dart:math' as Math;

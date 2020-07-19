@@ -13,16 +13,16 @@ class _DiaState extends State<Dia> {
       builder: (BuildContext context) {
         // return object of type Dialog
         return AlertDialog(
-          title:  Text("Red is winner"),
+          title: Text("Red is winner"),
           actions: <Widget>[
-             FlatButton(
-              child:  Text("Close"),
+            FlatButton(
+              child: Text("Close"),
               onPressed: () {
                 Navigator.of(context).pop();
               },
             ),
             FlatButton(
-              child:  Text("Play again"),
+              child: Text("Play again"),
               onPressed: () {
                 print('Play again');
                 Navigator.of(context).pop();

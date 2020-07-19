@@ -5,16 +5,16 @@ class AnimationIcon extends StatefulWidget {
   _AnimationIconState createState() => _AnimationIconState();
 }
 
-class _AnimationIconState extends State<AnimationIcon>with SingleTickerProviderStateMixin {
-  
+class _AnimationIconState extends State<AnimationIcon>
+    with SingleTickerProviderStateMixin {
   AnimationController _animationController;
   bool isPlaying = false;
 
   @override
   void initState() {
     super.initState();
-    _animationController =
-        AnimationController(vsync: this, duration: Duration(milliseconds: 2000));
+    _animationController = AnimationController(
+        vsync: this, duration: Duration(milliseconds: 2000));
   }
 
   @override

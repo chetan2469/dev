@@ -15,7 +15,6 @@ class CourseRecord {
         assert(map['imageUrl'] != null),
         assert(map['addDate'] != null),
         assert(map['addedBy'] != null),
-
         name = map['name'],
         duration = map['duration'],
         fees = map['fees'],

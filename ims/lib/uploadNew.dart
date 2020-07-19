@@ -20,8 +20,8 @@ class MyHomePage extends StatefulWidget {
   _MyHomePageState createState() => new _MyHomePageState();
 }
 
- String photourl =
-      'http://www.stleos.uq.edu.au/wp-content/uploads/2016/08/image-placeholder.png';
+String photourl =
+    'http://www.stleos.uq.edu.au/wp-content/uploads/2016/08/image-placeholder.png';
 
 class _MyHomePageState extends State<MyHomePage> {
   File _imageFile;
@@ -39,14 +39,12 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<Null> _uploadFile() async {
-    
     final Directory systemTempDir = Directory.systemTemp;
     final StorageReference ref =
         FirebaseStorage.instance.ref().child("foo.jpg");
 
     final StorageUploadTask uploadTask = ref.put(_imageFile);
-    setState(() {
-    });
+    setState(() {});
   }
 
   @override
@@ -62,13 +60,14 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
           RaisedButton(
             child: Text("Camera"),
-            onPressed: (){
+            onPressed: () {
               _pickImageFromCamera();
             },
           ),
         ],
       ),
-      body:_imageFile!=null?Image.file(_imageFile):Image.network(photourl),
+      body:
+          _imageFile != null ? Image.file(_imageFile) : Image.network(photourl),
       floatingActionButton: new FloatingActionButton(
         onPressed: _uploadFile,
         tooltip: 'Upload',

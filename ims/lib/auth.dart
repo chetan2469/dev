@@ -1,11 +1,10 @@
 import 'dart:async';
 import 'dart:convert' show json;
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:flutter/scheduler.dart';
 import "package:http/http.dart" as http;
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:ims/firestoreCRUD/list.dart';
 import 'package:ims/showMenu.dart';
 
 import 'constants/constants.dart';
@@ -33,6 +32,7 @@ class SignInGState extends State<SignInG> {
       }
     });
     _googleSignIn.signInSilently();
+    timeDilation = 3.0;
   }
 
   Future<void> _handleGetContact() async {
@@ -92,7 +92,7 @@ class SignInGState extends State<SignInG> {
           Container(
             color: Colors.white70,
           ),
-          
+          //  Positioned(child: Image(image: AssetImage('img/logo.png'))),
           Positioned(
             bottom: MediaQuery.of(context).size.height / 4,
             left: MediaQuery.of(context).size.width / 5,
@@ -108,7 +108,7 @@ class SignInGState extends State<SignInG> {
                   ),
                   child: Center(
                     child: Text(
-                      'Sign In with Google',
+                      'Sign In with Google First',
                       style: TextStyle(color: Colors.white, fontSize: 16),
                     ),
                   )),

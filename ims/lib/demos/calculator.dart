@@ -132,11 +132,9 @@ class _CalculatorState extends State<Calculator> {
                                   op = '+';
                                 }
 
-                                print("__a__"+a.toString());
-                                print("__b__"+b.toString());
-                                print("__v__"+val.toString());
-
-                                
+                                print("__a__" + a.toString());
+                                print("__b__" + b.toString());
+                                print("__v__" + val.toString());
                               });
                             },
                           ),

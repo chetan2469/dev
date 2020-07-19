@@ -7,28 +7,29 @@ class AnimatedContainerDemo extends StatefulWidget {
 
 class _AnimatedContainerDemoState extends State<AnimatedContainerDemo> {
   bool selected = false;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-          body: Container(
+      body: Container(
         child: GestureDetector(
-        onTap: () {
-          setState(() {
-            selected = !selected;
-          });
-        },
-        child: Center(
-          child: AnimatedContainer(
-            width: selected ? 200.0 : 100.0,
-            height: selected ? 100.0 : 200.0,
-            color: selected ? Colors.red : Colors.blue,
-            alignment:
-                selected ? Alignment.center : AlignmentDirectional.topCenter,
-            duration: Duration(seconds: 2),
-            curve: Curves.linear,
+          onTap: () {
+            setState(() {
+              selected = !selected;
+            });
+          },
+          child: Center(
+            child: AnimatedContainer(
+              width: selected ? 200.0 : 100.0,
+              height: selected ? 100.0 : 200.0,
+              color: selected ? Colors.red : Colors.blue,
+              alignment:
+                  selected ? Alignment.center : AlignmentDirectional.topCenter,
+              duration: Duration(seconds: 2),
+              curve: Curves.linear,
+            ),
           ),
         ),
-      ),
       ),
     );
   }

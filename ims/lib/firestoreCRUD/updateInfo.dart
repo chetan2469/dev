@@ -4,6 +4,7 @@ import 'data/Record.dart';
 
 class UpdateContestant extends StatefulWidget {
   DocumentSnapshot data;
+
   UpdateContestant(this.data);
 
   @override

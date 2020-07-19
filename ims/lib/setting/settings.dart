@@ -10,6 +10,7 @@ class _SettingsState extends State<Settings> {
   bool mode;
   List<String> _locations = ['A', 'B', 'C', 'D']; // Option 2
   String _selectedLocation;
+
   @override
   void initState() {
     // TODO: implement initState
