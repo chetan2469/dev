@@ -436,7 +436,11 @@ class _ShowMenu extends State<ShowMenu> {
                   color: Colors.black54,
                   borderRadius: BorderRadius.circular(12)),
               child: InkWell(
-                onTap: () {
+                onTap: () async {
+                  final user = await FirebaseAuth.instance.currentUser();
+                  Scaffold.of(context)
+                      .showSnackBar(SnackBar(content: Text("Logging Off")));
+                  FirebaseAuth.instance.signOut();
                   widget._handleSignOut();
                 },
                 child: ListTile(

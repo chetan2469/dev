@@ -37,49 +37,49 @@ class _StudentListViewState extends State<StudentListView> {
     'Admission',
   ];
 
-  void demoListEntry() async {
-    List selectedStudentReceiptReferences = List();
+  // void demoListEntry() async {
+  //   List selectedStudentReceiptReferences = List();
 
-    for (var item in studentList) {
-      DocumentReference referenceId =
-          Firestore.instance.collection('receipts').document();
-      await referenceId.setData({
-        'course_name': item.pursuing_course,
-        'paying_amount': 0,
-        'course_id': item.courses.last,
-        'receipt_date': DateTime(2019),
-        'next_installment_date': null,
-        'payment_method': 'Cash',
-        'receipt_page_number': '000',
-        'student_id': item.reference.documentID.toString(),
-        'note': 'default',
-      });
+  //   for (var item in studentList) {
+  //     DocumentReference referenceId =
+  //         Firestore.instance.collection('receipts').document();
+  //     await referenceId.setData({
+  //       'course_name': item.pursuing_course,
+  //       'paying_amount': 0,
+  //       'course_id': item.courses.last,
+  //       'receipt_date': DateTime(2019),
+  //       'next_installment_date': null,
+  //       'payment_method': 'Cash',
+  //       'receipt_page_number': '000',
+  //       'student_id': item.reference.documentID.toString(),
+  //       'note': 'default',
+  //     });
 
-      selectedStudentReceiptReferences.clear();
-      selectedStudentReceiptReferences.add(referenceId.documentID.toString());
+  //     selectedStudentReceiptReferences.clear();
+  //     selectedStudentReceiptReferences.add(referenceId.documentID.toString());
 
-      await Firestore.instance
-          .collection('admission')
-          .document(item.reference.documentID)
-          .setData({
-        'name': item.name,
-        'address': item.address,
-        'mobileNo': item.mobileno,
-        'optNumber': item.optionalno,
-        'aadharNo': item.aadharno,
-        'batchTime': item.batchtime,
-        'imageUrl': item.imageurl,
-        'dateOfBirth': item.dateofbirth,
-        'addDate': item.addDate,
-        'status': item.status,
-        'courses': item.courses,
-        'pursuing_course': item.pursuing_course,
-        'receipts': selectedStudentReceiptReferences,
-        'outStandingAmount': 0,
-        'addedBy': 'chetan2469@gmail.com'
-      });
-    }
-  }
+  //     await Firestore.instance
+  //         .collection('admission')
+  //         .document(item.reference.documentID)
+  //         .setData({
+  //       'name': item.name,
+  //       'address': item.address,
+  //       'mobileNo': item.mobileno,
+  //       'optNumber': item.optionalno,
+  //       'aadharNo': item.aadharno,
+  //       'batchTime': item.batchtime,
+  //       'imageUrl': item.imageurl,
+  //       'dateOfBirth': item.dateofbirth,
+  //       'addDate': item.addDate,
+  //       'status': item.status,
+  //       'courses': item.courses,
+  //       'pursuing_course': item.pursuing_course,
+  //       'receipts': selectedStudentReceiptReferences,
+  //       'outStandingAmount': 0,
+  //       'addedBy': 'chetan2469@gmail.com'
+  //     });
+  //   }
+  // }
 
   sortBy() {
     if (searchBy == 'Name') {

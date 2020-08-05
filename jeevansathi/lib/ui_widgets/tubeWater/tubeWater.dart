@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:ims/ui_widgets/waveView.dart';
+import 'package:jeevansathi/ui_widgets/waveView.dart';
 
-import 'appTheme.dart';
+import '../appTheme.dart';
 
 class TubeWater extends StatefulWidget {
   final double percent;

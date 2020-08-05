@@ -25,11 +25,11 @@ class _WaveViewState extends State<WaveView> with TickerProviderStateMixin {
   List<Offset> animList1 = [];
   Offset bottleOffset2 = Offset(60, 0);
   List<Offset> animList2 = [];
-  int ratio = 280, div = 315;
+  int ratio = 280, div = 455;
 
   //div = 100 for height 400
   //div = 225 for height 200
-  //div = 315 for height 100
+  //div = 315 for height 150
   //div = 455 for height 100
 
   @override

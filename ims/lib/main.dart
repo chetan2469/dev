@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:ims/ui_widgets/tubeWater.dart';
+import 'package:ims/auth.dart';
+import 'package:ims/ui_widgets/animatedLogo.dart';
+import 'package:ims/ui_widgets/tubeWater/tubeWater.dart';
 
 void main() => runApp(MyApp());
 
@@ -10,37 +12,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: Scaffold(
-        body: Center(
-            child: ListView(
-          children: <Widget>[
-            Row(
-              children: <Widget>[
-                Expanded(
-                    child: Container(
-                        margin: EdgeInsets.all(10),
-                        child: TubeWater(
-                          percent: 78,
-                          liquidColor: Colors.green,
-                          label: "Progress",
-                          tubeBorderColor: Colors.green,
-                          liquidUpperLayerColor: Colors.green[50],
-                        ))),
-                Expanded(
-                    child: Container(
-                        margin: EdgeInsets.all(10),
-                        child: TubeWater(
-                          percent: 45,
-                          liquidColor: Colors.black,
-                          label: "Lavel",
-                          tubeFontColor: Colors.white,
-                          liquidUpperLayerColor: Colors.grey,
-                        )))
-              ],
-            )
-          ],
-        )),
-      ),
+      home: SignInG(),
     );
   }
 }
