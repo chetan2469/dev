@@ -1,4 +1,4 @@
-package chedo.in.jeevansathi.jeevansathi
+package chedo.app.jeevansathi
 
 import io.flutter.embedding.android.FlutterActivity
 
