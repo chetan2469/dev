@@ -5,6 +5,7 @@ import 'package:flare_flutter/flare.dart';
 import 'package:flutter/material.dart';
 import 'package:jeevansathi/caldidateList.dart';
 import 'package:jeevansathi/navDrawer.dart';
+import 'package:jeevansathi/ui_widgets/waving.dart';
 import 'data.dart';
 import 'datatype/Record.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -87,174 +88,115 @@ class _Dashboard extends State<Dashboard> {
             : Container(
                 color: Colors.white,
                 child: Scaffold(
-                  appBar: AppBar(
-                    backgroundColor: Colors.blue[50].withOpacity(0.1),
-                    elevation: 0,
-                    iconTheme: IconThemeData(color: Colors.black),
-                    title: Text(
-                      widget.profile.name,
-                      style: TextStyle(color: Colors.black, fontSize: 14),
-                    ),
-                    actions: <Widget>[
-                      Container(
-                          margin: EdgeInsets.all(10),
-                          width: 40,
-                          child: Image.asset('assets/sak.png'))
-                    ],
-                  ),
-                  drawer: NavDrawer(),
-                  backgroundColor: Colors.transparent,
-                  body: Column(
-                    children: <Widget>[
-                      SizedBox(
-                        height: MediaQuery.of(context).padding.top,
+                    appBar: AppBar(
+                      backgroundColor: Colors.white,
+                      elevation: 1,
+                      iconTheme: IconThemeData(color: Colors.black),
+                      title: Text(
+                        widget.profile.name,
+                        style: TextStyle(color: Colors.black, fontSize: 14),
                       ),
-                      SizedBox(height: 10),
-                      Expanded(
-                          flex: 3,
-                          child: DelayedDisplay(
-                            delay: Duration(seconds: 1),
-                            child: Container(
-                                margin: EdgeInsets.all(10),
-                                child: CarouselSlider(
-                                    options: CarouselOptions(
-                                        onPageChanged: (index, reason) {
-                                          setState(() {
-                                            _current = index;
-                                          });
-                                        },
-                                        carouselController: CarouselController,
-                                        viewportFraction: 0.8,
-                                        initialPage: 0,
-                                        enableInfiniteScroll: true,
-                                        reverse: false,
-                                        autoPlay: true,
-                                        autoPlayInterval: Duration(seconds: 4),
-                                        autoPlayAnimationDuration:
-                                            Duration(milliseconds: 800),
-                                        autoPlayCurve: Curves.fastOutSlowIn,
-                                        enlargeCenterPage: true,
-                                        scrollDirection: Axis.horizontal,
-                                        height:
-                                            MediaQuery.of(context).size.height /
-                                                2),
-                                    items: imgList
-                                        .map((item) => Container(
-                                              margin: EdgeInsets.only(
-                                                  left: 20, right: 20),
-                                              child: Center(
-                                                  child: Image.asset(item,
-                                                      fit: BoxFit.cover,
-                                                      width: 10000)),
-                                            ))
-                                        .toList())),
-                          )),
-                      Expanded(
-                        flex: 1,
-                        child: DelayedDisplay(
-                          delay: Duration(milliseconds: 1500),
+                      actions: <Widget>[
+                        Container(
+                            margin: EdgeInsets.all(10),
+                            width: 40,
+                            child: Image.asset('assets/sak.png'))
+                      ],
+                    ),
+                    drawer: NavDrawer(),
+                    backgroundColor: Colors.transparent,
+                    body: Container(
+                        child: Stack(
+                      children: <Widget>[
+                        Container(),
+                        // Positioned(
+                        //   bottom: 0,
+                        //   right: 0,
+                        //   child: Container(height: 200, child: Waveing()),
+                        // ),
+                        Positioned(
+                          top: 50,
+                          left: 50,
                           child: Container(
+                            width: MediaQuery.of(context).size.width / 2.7,
                             child: Column(
                               children: <Widget>[
-                                Container(
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children:
-                                        map<Widget>(imgList, (index, url) {
-                                      return Container(
-                                        width: 7.0,
-                                        height: 7.0,
-                                        margin: EdgeInsets.symmetric(
-                                            vertical: 10.0, horizontal: 2.0),
-                                        decoration: BoxDecoration(
-                                          shape: BoxShape.circle,
-                                          color: _current == index
-                                              ? Colors.blue[200]
-                                              : Colors.blueAccent,
-                                        ),
-                                      );
-                                    }),
+                                InkWell(
+                                  onTap: () => Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              CandidateList('Male'))),
+                                  child: Card(
+                                    color: Colors.cyan[100],
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(20.0),
+                                    ),
+                                    elevation: 10,
+                                    child: Container(
+                                        height: 60,
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: <Widget>[
+                                            Text('Find Groom')
+                                          ],
+                                        )),
                                   ),
                                 ),
-                                Text(
-                                  'SAK Jeevansathi',
-                                  style: TextStyle(
-                                      color: Colors.red,
-                                      fontSize: 25,
-                                      fontWeight: FontWeight.w600),
+                                SizedBox(
+                                  height: 10,
                                 ),
-                                Text(
-                                  'Somvanshi Arya Kshatriyas Matrimonial Portal',
-                                  style: TextStyle(
-                                      color: Colors.red,
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w600),
-                                )
+                                InkWell(
+                                  onTap: () => Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              CandidateList('Female'))),
+                                  child: Card(
+                                    color: Colors.pink[100],
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(20.0),
+                                    ),
+                                    elevation: 10,
+                                    child: Container(
+                                        height: 60,
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: <Widget>[
+                                            Text('Find Bride')
+                                          ],
+                                        )),
+                                  ),
+                                ),
                               ],
                             ),
                           ),
                         ),
-                      ),
-                      Expanded(
-                        flex: 3,
-                        child: Row(
-                          children: <Widget>[
-                            Expanded(
-                                child: DelayedDisplay(
-                              delay: Duration(milliseconds: 2000),
-                              child: InkWell(
-                                onTap: () => Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            CandidateList('Male'))),
-                                child: Card(
-                                  elevation: 10,
-                                  margin: EdgeInsets.all(20),
-                                  child: Container(
-                                      height: 220,
-                                      child: Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: <Widget>[
-                                          Image.asset('assets/boy.png'),
-                                          Text('Find Groom')
-                                        ],
-                                      )),
-                                ),
-                              ),
-                            )),
-                            Expanded(
-                                child: DelayedDisplay(
-                              delay: Duration(milliseconds: 2500),
-                              child: InkWell(
-                                onTap: () => Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            CandidateList('Female'))),
-                                child: Card(
-                                  elevation: 10,
-                                  margin: EdgeInsets.all(20),
-                                  child: Container(
-                                      height: 220,
-                                      child: Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: <Widget>[
-                                          Image.asset('assets/girl.png'),
-                                          Text('Find Bride')
-                                        ],
-                                      )),
-                                ),
-                              ),
-                            )),
-                          ],
+                        Positioned(
+                          left: 10,
+                          bottom: -20,
+                          child: Container(
+                              height: MediaQuery.of(context).size.width / 1.5,
+                              child: Image.asset('assets/flower.png')),
                         ),
-                      ),
-                    ],
-                  ),
-                ),
+                        Positioned(
+                          bottom: 0,
+                          right: 0,
+                          child: Container(
+                              width: MediaQuery.of(context).size.width,
+                              child: Image.asset('assets/backFlow.png')),
+                        ),
+                        Positioned(
+                          bottom: 0,
+                          right: 0,
+                          child: Container(
+                              height: MediaQuery.of(context).size.height / 2,
+                              child: Image.asset('assets/couple.png')),
+                        ),
+                      ],
+                    ))),
               ));
   }
 }

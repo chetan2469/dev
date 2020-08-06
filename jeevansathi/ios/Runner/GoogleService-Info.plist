@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>555443598127-a1553tdl4vddnfj4k73revov8a8s23oq.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.555443598127-a1553tdl4vddnfj4k73revov8a8s23oq</string>
+	<key>ANDROID_CLIENT_ID</key>
+	<string>555443598127-ibb2kjjtal15qne3pg0djd438d297t56.apps.googleusercontent.com</string>
+	<key>API_KEY</key>
+	<string>AIzaSyAMSkZ7aXlFSac6P8n_UvbWGXYqXBK5TV0</string>
+	<key>GCM_SENDER_ID</key>
+	<string>555443598127</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>chedo.app.jeevansathi</string>
+	<key>PROJECT_ID</key>
+	<string>chedo-3b1e8</string>
+	<key>STORAGE_BUCKET</key>
+	<string>chedo-3b1e8.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:555443598127:ios:4b4a8112f6040518e9e7da</string>
+	<key>DATABASE_URL</key>
+	<string>https://chedo-3b1e8.firebaseio.com</string>
+</dict>
+</plist>
