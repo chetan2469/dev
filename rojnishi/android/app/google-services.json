@@ -1,0 +1,283 @@
+{
+  "project_info": {
+    "project_number": "915649074065",
+    "firebase_url": "https://flutter-chedo.firebaseio.com",
+    "project_id": "flutter-chedo",
+    "storage_bucket": "flutter-chedo.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:915649074065:android:855d66c2580f7dd3550030",
+        "android_client_info": {
+          "package_name": "app.chedo.ims"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "915649074065-boi2man24jb6gde8q8sb1g3eq5p32chl.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "app.chedo.ims",
+            "certificate_hash": "e88550a3b98c8202e901f3399dfa373d9a60a524"
+          }
+        },
+        {
+          "client_id": "915649074065-lf547jjltf79mt4s07r2rja33bhgi7lk.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDmHddNeHRQeTcJpJhD0CZ3LPv4XHOk1TU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "915649074065-lf547jjltf79mt4s07r2rja33bhgi7lk.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "915649074065-0hc1uhiaprsg0h550l6986josea39ld5.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "chedo.in.ims"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:915649074065:android:3fb737b88b5e72c2550030",
+        "android_client_info": {
+          "package_name": "chedo.app.institute_management_system"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "915649074065-4a9icmomuabo4dtpp44o2kh75edqbhdq.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "chedo.app.institute_management_system",
+            "certificate_hash": "a74362341fc177d16759c12af16d23829712dc8f"
+          }
+        },
+        {
+          "client_id": "915649074065-lf547jjltf79mt4s07r2rja33bhgi7lk.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDmHddNeHRQeTcJpJhD0CZ3LPv4XHOk1TU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "915649074065-lf547jjltf79mt4s07r2rja33bhgi7lk.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "915649074065-0hc1uhiaprsg0h550l6986josea39ld5.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "chedo.in.ims"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:915649074065:android:1ad3b1edb714b58e550030",
+        "android_client_info": {
+          "package_name": "chedo.dev.ims"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "915649074065-6h6as6kkfloicald853rjjg6t2rr2lcq.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "chedo.dev.ims",
+            "certificate_hash": "a74362341fc177d16759c12af16d23829712dc8f"
+          }
+        },
+        {
+          "client_id": "915649074065-lf547jjltf79mt4s07r2rja33bhgi7lk.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDmHddNeHRQeTcJpJhD0CZ3LPv4XHOk1TU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "915649074065-lf547jjltf79mt4s07r2rja33bhgi7lk.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "915649074065-0hc1uhiaprsg0h550l6986josea39ld5.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "chedo.in.ims"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:915649074065:android:ea3042b12a20b525550030",
+        "android_client_info": {
+          "package_name": "com.chedo.rojnishi"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "915649074065-hhhifh6sto8frp2c9i0qpqukv4s7tghm.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.chedo.rojnishi",
+            "certificate_hash": "e88550a3b98c8202e901f3399dfa373d9a60a524"
+          }
+        },
+        {
+          "client_id": "915649074065-lf547jjltf79mt4s07r2rja33bhgi7lk.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDmHddNeHRQeTcJpJhD0CZ3LPv4XHOk1TU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "915649074065-lf547jjltf79mt4s07r2rja33bhgi7lk.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "915649074065-0hc1uhiaprsg0h550l6986josea39ld5.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "chedo.in.ims"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:915649074065:android:21b2729307bc608c550030",
+        "android_client_info": {
+          "package_name": "com.example.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "915649074065-95l44d666mmpv87896ng58ibvis7bc1q.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.app",
+            "certificate_hash": "3c2d5f1175fd1659237ba3a6fd694c13a97871e6"
+          }
+        },
+        {
+          "client_id": "915649074065-a3heau9r4gcto1ujkooe8bv2kesr4oin.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.app",
+            "certificate_hash": "a74362341fc177d16759c12af16d23829712dc8f"
+          }
+        },
+        {
+          "client_id": "915649074065-lf547jjltf79mt4s07r2rja33bhgi7lk.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDmHddNeHRQeTcJpJhD0CZ3LPv4XHOk1TU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "915649074065-lf547jjltf79mt4s07r2rja33bhgi7lk.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "915649074065-0hc1uhiaprsg0h550l6986josea39ld5.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "chedo.in.ims"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:915649074065:android:d138fc2e467ba6a1550030",
+        "android_client_info": {
+          "package_name": "com.example.chedo_student"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "915649074065-qmq1mdfld6h64au5hhejjm7q7t9jsf5r.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.chedo_student",
+            "certificate_hash": "bd6eb5f64afb23cf640bba371fc045df96109f66"
+          }
+        },
+        {
+          "client_id": "915649074065-lf547jjltf79mt4s07r2rja33bhgi7lk.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDmHddNeHRQeTcJpJhD0CZ3LPv4XHOk1TU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "915649074065-lf547jjltf79mt4s07r2rja33bhgi7lk.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "915649074065-0hc1uhiaprsg0h550l6986josea39ld5.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "chedo.in.ims"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
